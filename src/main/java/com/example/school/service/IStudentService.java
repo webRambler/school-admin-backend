@@ -35,4 +35,7 @@ public interface IStudentService {
     List<StudentCourseScoreVO> getStudentCourseScores(Long studentId);
 
     Long countCoursesByStudentId(Long studentId);
+
+    // 多条件查询学生信息（含班级名称、专业名称）
+    List<StudentWithClassVO> searchStudentsWithClass(String gender, String className, String name, String major, Integer age);
 }

@@ -51,4 +51,11 @@ public interface StudentMapper {
 
     // 统计学生选修课程数量
     Long countCoursesByStudentId(Long studentId);
+
+    // 多条件查询学生信息（含班级名称、专业名称）
+    List<StudentWithClassVO> searchStudentsWithClass(@Param("gender") String gender,
+                                                     @Param("className") String className,
+                                                     @Param("name") String name,
+                                                     @Param("major") String major,
+                                                     @Param("age") Integer age);
 }

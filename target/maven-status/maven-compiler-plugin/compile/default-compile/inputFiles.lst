@@ -1,4 +1,5 @@
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\entity\User.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\IScoreRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\ICollegeService.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\CourseUpdateRequest.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\mapper\CourseMapper.java
@@ -16,6 +17,8 @@ D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\CourseCr
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\config\WebMvcConfig.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\vo\ScoreRankVO.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\entity\Student.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\CollegeRepositoryImpl.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\StudentRepositoryImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\ClassRoomController.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\TeacherCreateRequest.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\ScoreController.java
@@ -23,6 +26,8 @@ D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\A
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\mapper\CollegeMapper.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\vo\ClassRoomStatisticsVO.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\ITeacherService.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\ICollegeRepository.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\IClassRoomRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\IClassRoomService.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\ClassRoomCreateRequest.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\config\RedisConfig.java
@@ -38,9 +43,13 @@ D:\java-codes\school-admin-backend\src\main\java\com\example\school\vo\StudentCo
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\mapper\UserMapper.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\CollegeController.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\entity\Teacher.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\ScoreRepositoryImpl.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\ClassRoomRepositoryImpl.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\ITeacherRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\impl\ClassRoomServiceImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\TeacherController.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\mapper\StudentMapper.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\ICourseRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\common\PageResult.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\ScoreUpdateRequest.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\impl\StudentServiceImpl.java
@@ -54,13 +63,18 @@ D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\StudentU
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\StudentController.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\impl\CollegeServiceImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\impl\TeacherServiceImpl.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\IStudentRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\vo\ScoreDetailVO.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\common\BusinessException.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\SchoolApplication.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\common\Result.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\CourseRepositoryImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\StudentCreateRequest.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\TeacherRepositoryImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\service\impl\AuthServiceImpl.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\TeacherUpdateRequest.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\impl\UserRepositoryImpl.java
+D:\java-codes\school-admin-backend\src\main\java\com\example\school\repository\IUserRepository.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\mapper\ScoreMapper.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\controller\CourseController.java
 D:\java-codes\school-admin-backend\src\main\java\com\example\school\dto\LoginRequest.java

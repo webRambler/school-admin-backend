@@ -3,7 +3,7 @@ package com.example.school.service.impl;
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Course;
-import com.example.school.mapper.CourseMapper;
+import com.example.school.repository.ICourseRepository;
 import com.example.school.service.ICourseService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.CourseStatisticsVO;
@@ -16,27 +16,27 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CourseServiceImpl implements ICourseService {
 
-    private final CourseMapper courseMapper;
+    private final ICourseRepository courseRepository;
     private final RedisService redisService;
 
     private static final String COURSE_KEY_PREFIX = "course:";
     private static final long COURSE_CACHE_TTL = 30;
 
-    public CourseServiceImpl(CourseMapper courseMapper, RedisService redisService) {
-        this.courseMapper = courseMapper;
+    public CourseServiceImpl(ICourseRepository courseRepository, RedisService redisService) {
+        this.courseRepository = courseRepository;
         this.redisService = redisService;
     }
 
     @Override
     public Course createCourse(Course course) {
-        courseMapper.insertCourse(course);
+        courseRepository.insertCourse(course);
         redisService.set(COURSE_KEY_PREFIX + course.getId(), course, COURSE_CACHE_TTL, TimeUnit.MINUTES);
         return course;
     }
 
     @Override
     public List<Course> getAllCourses() {
-        return courseMapper.selectAllCourses();
+        return courseRepository.selectAllCourses();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CourseServiceImpl implements ICourseService {
         if (cached instanceof Course) {
             return (Course) cached;
         }
-        Course course = courseMapper.selectCourseById(id);
+        Course course = courseRepository.selectCourseById(id);
         if (course == null) {
             throw new BusinessException(ResultCode.COURSE_NOT_FOUND);
         }
@@ -56,17 +56,17 @@ public class CourseServiceImpl implements ICourseService {
 
     @Override
     public List<Course> getCoursesByName(String name) {
-        return courseMapper.selectCoursesByName(name);
+        return courseRepository.selectCoursesByName(name);
     }
 
     @Override
     public List<Course> getCoursesByCredit(BigDecimal credit) {
-        return courseMapper.selectCoursesByCredit(credit);
+        return courseRepository.selectCoursesByCredit(credit);
     }
 
     @Override
     public List<Course> getCoursesBySemester(String semester) {
-        return courseMapper.selectCoursesBySemester(semester);
+        return courseRepository.selectCoursesBySemester(semester);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class CourseServiceImpl implements ICourseService {
         if (courseDetails.getSemester() != null) {
             course.setSemester(courseDetails.getSemester());
         }
-        courseMapper.updateCourse(course);
+        courseRepository.updateCourse(course);
         redisService.set(COURSE_KEY_PREFIX + id, course, COURSE_CACHE_TTL, TimeUnit.MINUTES);
         return course;
     }
@@ -95,13 +95,13 @@ public class CourseServiceImpl implements ICourseService {
     @Override
     public void deleteCourse(Long id) {
         getCourseById(id);
-        courseMapper.deleteCourse(id);
+        courseRepository.deleteCourse(id);
         redisService.delete(COURSE_KEY_PREFIX + id);
     }
 
     @Override
     public CourseStatisticsVO getCourseStatistics(Long courseId) {
         getCourseById(courseId); // 确保课程存在
-        return courseMapper.selectCourseStatistics(courseId);
+        return courseRepository.selectCourseStatistics(courseId);
     }
 }

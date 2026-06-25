@@ -3,7 +3,7 @@ package com.example.school.service.impl;
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.ClassRoom;
-import com.example.school.mapper.ClassRoomMapper;
+import com.example.school.repository.IClassRoomRepository;
 import com.example.school.service.IClassRoomService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.ClassRoomStatisticsVO;
@@ -15,27 +15,27 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ClassRoomServiceImpl implements IClassRoomService {
 
-    private final ClassRoomMapper classRoomMapper;
+    private final IClassRoomRepository classRoomRepository;
     private final RedisService redisService;
 
     private static final String CLASSROOM_KEY_PREFIX = "classroom:";
     private static final long CLASSROOM_CACHE_TTL = 30;
 
-    public ClassRoomServiceImpl(ClassRoomMapper classRoomMapper, RedisService redisService) {
-        this.classRoomMapper = classRoomMapper;
+    public ClassRoomServiceImpl(IClassRoomRepository classRoomRepository, RedisService redisService) {
+        this.classRoomRepository = classRoomRepository;
         this.redisService = redisService;
     }
 
     @Override
     public ClassRoom createClassRoom(ClassRoom classRoom) {
-        classRoomMapper.insertClassRoom(classRoom);
+        classRoomRepository.insertClassRoom(classRoom);
         redisService.set(CLASSROOM_KEY_PREFIX + classRoom.getId(), classRoom, CLASSROOM_CACHE_TTL, TimeUnit.MINUTES);
         return classRoom;
     }
 
     @Override
     public List<ClassRoom> getAllClassRooms() {
-        return classRoomMapper.selectAllClassRooms();
+        return classRoomRepository.selectAllClassRooms();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ClassRoomServiceImpl implements IClassRoomService {
             return (ClassRoom) cached;
         }
         // 缓存未命中，查数据库
-        ClassRoom classRoom = classRoomMapper.selectClassRoomById(id);
+        ClassRoom classRoom = classRoomRepository.selectClassRoomById(id);
         if (classRoom == null) {
             throw new BusinessException(ResultCode.CLASSROOM_NOT_FOUND);
         }
@@ -57,17 +57,17 @@ public class ClassRoomServiceImpl implements IClassRoomService {
 
     @Override
     public List<ClassRoom> getClassRoomsByName(String name) {
-        return classRoomMapper.selectClassRoomsByName(name);
+        return classRoomRepository.selectClassRoomsByName(name);
     }
 
     @Override
     public List<ClassRoom> getClassRoomsByGrade(String grade) {
-        return classRoomMapper.selectClassRoomsByGrade(grade);
+        return classRoomRepository.selectClassRoomsByGrade(grade);
     }
 
     @Override
     public List<ClassRoom> getClassRoomsByMajor(String major) {
-        return classRoomMapper.selectClassRoomsByMajor(major);
+        return classRoomRepository.selectClassRoomsByMajor(major);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ClassRoomServiceImpl implements IClassRoomService {
         if (classRoomDetails.getTeacher() != null) {
             classRoom.setTeacher(classRoomDetails.getTeacher());
         }
-        classRoomMapper.updateClassRoom(classRoom);
+        classRoomRepository.updateClassRoom(classRoom);
         redisService.set(CLASSROOM_KEY_PREFIX + id, classRoom, CLASSROOM_CACHE_TTL, TimeUnit.MINUTES);
         return classRoom;
     }
@@ -97,22 +97,22 @@ public class ClassRoomServiceImpl implements IClassRoomService {
     public void deleteClassRoom(Long id) {
         getClassRoomById(id);
         // 检查班级下是否还有学生
-        Long studentCount = classRoomMapper.countStudentsByClassRoomId(id);
+        Long studentCount = classRoomRepository.countStudentsByClassRoomId(id);
         if (studentCount > 0) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "该班级下还有" + studentCount + "名学生，无法删除");
         }
-        classRoomMapper.deleteClassRoom(id);
+        classRoomRepository.deleteClassRoom(id);
         redisService.delete(CLASSROOM_KEY_PREFIX + id);
     }
 
     @Override
     public Long countStudentsByClassRoomId(Long classRoomId) {
-        return classRoomMapper.countStudentsByClassRoomId(classRoomId);
+        return classRoomRepository.countStudentsByClassRoomId(classRoomId);
     }
 
     @Override
     public ClassRoomStatisticsVO getClassRoomStatistics(Long classRoomId) {
         getClassRoomById(classRoomId); // 确保班级存在
-        return classRoomMapper.selectClassRoomStatistics(classRoomId);
+        return classRoomRepository.selectClassRoomStatistics(classRoomId);
     }
 }

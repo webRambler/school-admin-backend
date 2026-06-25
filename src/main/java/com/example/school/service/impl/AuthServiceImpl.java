@@ -3,7 +3,7 @@ package com.example.school.service.impl;
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.User;
-import com.example.school.mapper.UserMapper;
+import com.example.school.repository.IUserRepository;
 import com.example.school.service.IAuthService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.LoginVO;
@@ -29,13 +29,13 @@ public class AuthServiceImpl implements IAuthService {
     /** refreshToken 有效期：7 天 */
     private static final long REFRESH_TTL_DAYS = 7;
 
-    private final UserMapper userMapper;
+    private final IUserRepository userRepository;
     private final RedisService redisService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserMapper userMapper, RedisService redisService,
+    public AuthServiceImpl(IUserRepository userRepository, RedisService redisService,
                            BCryptPasswordEncoder passwordEncoder) {
-        this.userMapper = userMapper;
+        this.userRepository = userRepository;
         this.redisService = redisService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -43,7 +43,7 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public LoginVO login(String username, String password) {
         // 1. 验证用户名密码（生产环境通过 HTTPS 传输）
-        User user = userMapper.selectByUsername(username);
+        User user = userRepository.selectByUsername(username);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "账号或密码错误");
         }
@@ -55,7 +55,7 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public LoginVO register(String username, String password, String nickname) {
         // 1. 校验用户名是否已存在
-        User existUser = userMapper.selectByUsername(username);
+        User existUser = userRepository.selectByUsername(username);
         if (existUser != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "账号已存在");
         }
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements IAuthService {
         user.setNickname(nickname != null && !nickname.isEmpty() ? nickname : username);
         user.setCreateTime(LocalDateTime.now());
         user.setUpdateTime(LocalDateTime.now());
-        userMapper.insert(user);
+        userRepository.insert(user);
 
         // 3. 注册成功后自动登录，生成双 Token
         return buildTokenPair(user);
@@ -88,7 +88,7 @@ public class AuthServiceImpl implements IAuthService {
         String username = usernameObj.toString();
 
         // 2. 查询用户信息
-        User user = userMapper.selectByUsername(username);
+        User user = userRepository.selectByUsername(username);
         if (user == null) {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "用户不存在");
         }
@@ -152,7 +152,7 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public LoginVO getUser(String username) {
-        User user = userMapper.selectByUsername(username);
+        User user = userRepository.selectByUsername(username);
         if (user == null) {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "用户不存在");
         }

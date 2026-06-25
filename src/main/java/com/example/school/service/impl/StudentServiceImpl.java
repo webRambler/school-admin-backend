@@ -3,8 +3,8 @@ package com.example.school.service.impl;
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Student;
-import com.example.school.mapper.ScoreMapper;
-import com.example.school.mapper.StudentMapper;
+import com.example.school.repository.IScoreRepository;
+import com.example.school.repository.IStudentRepository;
 import com.example.school.service.IStudentService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.StudentCourseScoreVO;
@@ -17,29 +17,29 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class StudentServiceImpl implements IStudentService {
 
-    private final StudentMapper studentMapper;
-    private final ScoreMapper scoreMapper;
+    private final IStudentRepository studentRepository;
+    private final IScoreRepository scoreRepository;
     private final RedisService redisService;
 
     private static final String STUDENT_KEY_PREFIX = "student:";
     private static final long STUDENT_CACHE_TTL = 30;
 
-    public StudentServiceImpl(StudentMapper studentMapper, ScoreMapper scoreMapper, RedisService redisService) {
-        this.studentMapper = studentMapper;
-        this.scoreMapper = scoreMapper;
+    public StudentServiceImpl(IStudentRepository studentRepository, IScoreRepository scoreRepository, RedisService redisService) {
+        this.studentRepository = studentRepository;
+        this.scoreRepository = scoreRepository;
         this.redisService = redisService;
     }
 
     @Override
     public Student createStudent(Student student) {
-        studentMapper.insertStudent(student);
+        studentRepository.insertStudent(student);
         redisService.set(STUDENT_KEY_PREFIX + student.getId(), student, STUDENT_CACHE_TTL, TimeUnit.MINUTES);
         return student;
     }
 
     @Override
     public List<Student> getAllStudents() {
-        return studentMapper.selectAllStudents();
+        return studentRepository.selectAllStudents();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class StudentServiceImpl implements IStudentService {
         if (cached instanceof Student) {
             return (Student) cached;
         }
-        Student student = studentMapper.selectStudentById(id);
+        Student student = studentRepository.selectStudentById(id);
         if (student == null) {
             throw new BusinessException(ResultCode.STUDENT_NOT_FOUND);
         }
@@ -59,17 +59,17 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     public List<Student> getStudentsByName(String name) {
-        return studentMapper.selectStudentsByName(name);
+        return studentRepository.selectStudentsByName(name);
     }
 
     @Override
     public List<Student> getStudentsByClassId(Long classId) {
-        return studentMapper.selectStudentsByClassId(classId);
+        return studentRepository.selectStudentsByClassId(classId);
     }
 
     @Override
     public List<Student> getStudentsByGender(String gender) {
-        return studentMapper.selectStudentsByGender(gender);
+        return studentRepository.selectStudentsByGender(gender);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class StudentServiceImpl implements IStudentService {
         if (studentDetails.getEmail() != null) {
             student.setEmail(studentDetails.getEmail());
         }
-        studentMapper.updateStudent(student);
+        studentRepository.updateStudent(student);
         redisService.set(STUDENT_KEY_PREFIX + id, student, STUDENT_CACHE_TTL, TimeUnit.MINUTES);
         return student;
     }
@@ -102,8 +102,8 @@ public class StudentServiceImpl implements IStudentService {
     public void deleteStudent(Long id) {
         getStudentById(id);
         // 删除学生时，同时删除其所有成绩
-        scoreMapper.deleteScoresByStudentId(id);
-        studentMapper.deleteStudent(id);
+        scoreRepository.deleteScoresByStudentId(id);
+        studentRepository.deleteStudent(id);
         redisService.delete(STUDENT_KEY_PREFIX + id);
     }
 
@@ -112,28 +112,33 @@ public class StudentServiceImpl implements IStudentService {
     @Override
     public StudentWithClassVO getStudentWithClass(Long studentId) {
         getStudentById(studentId); // 确保学生存在
-        return studentMapper.selectStudentWithClass(studentId);
+        return studentRepository.selectStudentWithClass(studentId);
     }
 
     @Override
     public List<StudentWithClassVO> getStudentsWithClassByClassId(Long classId) {
-        return studentMapper.selectStudentsWithClassByClassId(classId);
+        return studentRepository.selectStudentsWithClassByClassId(classId);
     }
 
     @Override
     public List<StudentWithClassVO> getAllStudentsWithClass() {
-        return studentMapper.selectAllStudentsWithClass();
+        return studentRepository.selectAllStudentsWithClass();
     }
 
     @Override
     public List<StudentCourseScoreVO> getStudentCourseScores(Long studentId) {
         getStudentById(studentId); // 确保学生存在
-        return studentMapper.selectStudentCourseScores(studentId);
+        return studentRepository.selectStudentCourseScores(studentId);
     }
 
     @Override
     public Long countCoursesByStudentId(Long studentId) {
         getStudentById(studentId); // 确保学生存在
-        return studentMapper.countCoursesByStudentId(studentId);
+        return studentRepository.countCoursesByStudentId(studentId);
+    }
+
+    @Override
+    public List<StudentWithClassVO> searchStudentsWithClass(String gender, String className, String name, String major, Integer age) {
+        return studentRepository.searchStudentsWithClass(gender, className, name, major, age);
     }
 }

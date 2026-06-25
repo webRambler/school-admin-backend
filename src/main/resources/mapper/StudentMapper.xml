@@ -104,4 +104,31 @@
         SELECT COUNT(DISTINCT course_id) FROM score WHERE student_id = #{studentId}
     </select>
 
+    <!-- 多条件查询学生信息（含班级名称、专业名称） -->
+    <select id="searchStudentsWithClass" resultType="StudentWithClassVO">
+        SELECT
+            s.id, s.name, s.gender, s.age, s.class_id, s.phone, s.email,
+            s.create_time, s.update_time,
+            cr.name AS className, cr.grade, cr.major, cr.teacher
+        FROM student s
+        LEFT JOIN class_room cr ON s.class_id = cr.id
+        <where>
+            <if test="gender != null and gender != ''">
+                AND s.gender = #{gender}
+            </if>
+            <if test="className != null and className != ''">
+                AND cr.name LIKE CONCAT('%', #{className}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND s.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="major != null and major != ''">
+                AND cr.major LIKE CONCAT('%', #{major}, '%')
+            </if>
+            <if test="age != null">
+                AND s.age = #{age}
+            </if>
+        </where>
+    </select>
+
 </mapper>

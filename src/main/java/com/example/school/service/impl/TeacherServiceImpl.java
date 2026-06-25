@@ -3,7 +3,7 @@ package com.example.school.service.impl;
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Teacher;
-import com.example.school.mapper.TeacherMapper;
+import com.example.school.repository.ITeacherRepository;
 import com.example.school.service.ITeacherService;
 import com.example.school.service.RedisService;
 import org.springframework.stereotype.Service;
@@ -14,27 +14,27 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class TeacherServiceImpl implements ITeacherService {
 
-    private final TeacherMapper teacherMapper;
+    private final ITeacherRepository teacherRepository;
     private final RedisService redisService;
 
     private static final String TEACHER_KEY_PREFIX = "teacher:";
     private static final long TEACHER_CACHE_TTL = 30;
 
-    public TeacherServiceImpl(TeacherMapper teacherMapper, RedisService redisService) {
-        this.teacherMapper = teacherMapper;
+    public TeacherServiceImpl(ITeacherRepository teacherRepository, RedisService redisService) {
+        this.teacherRepository = teacherRepository;
         this.redisService = redisService;
     }
 
     @Override
     public Teacher createTeacher(Teacher teacher) {
-        teacherMapper.insertTeacher(teacher);
+        teacherRepository.insertTeacher(teacher);
         redisService.set(TEACHER_KEY_PREFIX + teacher.getId(), teacher, TEACHER_CACHE_TTL, TimeUnit.MINUTES);
         return teacher;
     }
 
     @Override
     public List<Teacher> getAllTeachers() {
-        return teacherMapper.selectAllTeachers();
+        return teacherRepository.selectAllTeachers();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TeacherServiceImpl implements ITeacherService {
         if (cached instanceof Teacher) {
             return (Teacher) cached;
         }
-        Teacher teacher = teacherMapper.selectTeacherById(id);
+        Teacher teacher = teacherRepository.selectTeacherById(id);
         if (teacher == null) {
             throw new BusinessException(ResultCode.TEACHER_NOT_FOUND);
         }
@@ -54,12 +54,12 @@ public class TeacherServiceImpl implements ITeacherService {
 
     @Override
     public List<Teacher> getTeachersByName(String name) {
-        return teacherMapper.selectTeachersByName(name);
+        return teacherRepository.selectTeachersByName(name);
     }
 
     @Override
     public List<Teacher> getTeachersByTitle(String title) {
-        return teacherMapper.selectTeachersByTitle(title);
+        return teacherRepository.selectTeachersByTitle(title);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class TeacherServiceImpl implements ITeacherService {
         if (teacherDetails.getEmail() != null) {
             teacher.setEmail(teacherDetails.getEmail());
         }
-        teacherMapper.updateTeacher(teacher);
+        teacherRepository.updateTeacher(teacher);
         redisService.set(TEACHER_KEY_PREFIX + id, teacher, TEACHER_CACHE_TTL, TimeUnit.MINUTES);
         return teacher;
     }
@@ -94,7 +94,7 @@ public class TeacherServiceImpl implements ITeacherService {
     @Override
     public void deleteTeacher(Long id) {
         getTeacherById(id);
-        teacherMapper.deleteTeacher(id);
+        teacherRepository.deleteTeacher(id);
         redisService.delete(TEACHER_KEY_PREFIX + id);
     }
 }

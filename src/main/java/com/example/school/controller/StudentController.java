@@ -119,4 +119,18 @@ public class StudentController {
     public Result<Long> countCoursesByStudentId(@PathVariable Long id) {
         return Result.success(studentService.countCoursesByStudentId(id));
     }
+
+    // 查：多条件查询学生信息（含班级名称、专业名称）
+    @GetMapping("/search/condition")
+    public Result<PageResult<StudentWithClassVO>> searchStudentsWithClass(
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String className,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String major,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.searchStudentsWithClass(gender, className, name, major, age)));
+    }
 }
