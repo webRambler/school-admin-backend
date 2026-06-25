@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.school.mapper.CourseMapper">
+
+    <!-- 新增课程 -->
+    <insert id="insertCourse" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course (name, credit, hours, semester, create_time, update_time)
+        VALUES (#{name}, #{credit}, #{hours}, #{semester}, NOW(), NOW())
+    </insert>
+
+    <!-- 查询所有课程 -->
+    <select id="selectAllCourses" resultType="Course">
+        SELECT id, name, credit, hours, semester, create_time, update_time FROM course
+    </select>
+
+    <!-- 根据ID查询课程 -->
+    <select id="selectCourseById" resultType="Course">
+        SELECT id, name, credit, hours, semester, create_time, update_time FROM course WHERE id = #{id}
+    </select>
+
+    <!-- 根据名称模糊查询课程 -->
+    <select id="selectCoursesByName" resultType="Course">
+        SELECT id, name, credit, hours, semester, create_time, update_time FROM course WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+    <!-- 根据学分查询课程 -->
+    <select id="selectCoursesByCredit" resultType="Course">
+        SELECT id, name, credit, hours, semester, create_time, update_time FROM course WHERE credit = #{credit}
+    </select>
+
+    <!-- 根据学期查询课程 -->
+    <select id="selectCoursesBySemester" resultType="Course">
+        SELECT id, name, credit, hours, semester, create_time, update_time FROM course WHERE semester = #{semester}
+    </select>
+
+    <!-- 更新课程 -->
+    <update id="updateCourse">
+        UPDATE course
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="credit != null">credit = #{credit},</if>
+            <if test="hours != null">hours = #{hours},</if>
+            <if test="semester != null">semester = #{semester},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除课程 -->
+    <delete id="deleteCourse">
+        DELETE FROM course WHERE id = #{id}
+    </delete>
+
+    <!-- 获取课程成绩统计（连接查询：课程 + 成绩） -->
+    <select id="selectCourseStatistics" resultType="CourseStatisticsVO">
+        SELECT
+            c.id AS courseId,
+            c.name AS courseName,
+            c.credit,
+            COUNT(sc.id) AS studentCount,
+            ROUND(AVG(sc.score), 2) AS avgScore,
+            MAX(sc.score) AS maxScore,
+            MIN(sc.score) AS minScore,
+            SUM(CASE WHEN sc.score >= 60 THEN 1 ELSE 0 END) AS passCount,
+            ROUND(SUM(CASE WHEN sc.score >= 60 THEN 1 ELSE 0 END) * 100.0 / COUNT(sc.id), 2) AS passRate
+        FROM course c
+        LEFT JOIN score sc ON sc.course_id = c.id
+        WHERE c.id = #{courseId}
+        GROUP BY c.id, c.name, c.credit
+    </select>
+
+</mapper>

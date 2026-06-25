@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.school.mapper.CollegeMapper">
+
+    <!-- 新增学院 -->
+    <insert id="insertCollege" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO college (name, code, description, dean, phone, create_time, update_time)
+        VALUES (#{name}, #{code}, #{description}, #{dean}, #{phone}, NOW(), NOW())
+    </insert>
+
+    <!-- 查询所有学院 -->
+    <select id="selectAllColleges" resultType="College">
+        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college
+    </select>
+
+    <!-- 根据ID查询学院 -->
+    <select id="selectCollegeById" resultType="College">
+        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college WHERE id = #{id}
+    </select>
+
+    <!-- 根据名称模糊查询学院 -->
+    <select id="selectCollegesByName" resultType="College">
+        SELECT id, name, code, description, dean, phone, create_time, update_time
+        FROM college WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+    <!-- 根据学院代码查询学院 -->
+    <select id="selectCollegeByCode" resultType="College">
+        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college WHERE code = #{code}
+    </select>
+
+    <!-- 更新学院 -->
+    <update id="updateCollege">
+        UPDATE college
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="dean != null">dean = #{dean},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除学院 -->
+    <delete id="deleteCollege">
+        DELETE FROM college WHERE id = #{id}
+    </delete>
+
+    <!-- 统计学院下班级数量 -->
+    <select id="countClassesByCollegeId" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM class_room WHERE college_id = #{collegeId}
+    </select>
+
+    <!-- 获取学院统计信息（连接查询：学院 + 班级 + 学生） -->
+    <select id="selectCollegeStatistics" resultType="CollegeWithClassesVO">
+        SELECT
+            col.id AS collegeId,
+            col.name AS collegeName,
+            col.code AS collegeCode,
+            col.description,
+            col.dean,
+            col.phone,
+            col.create_time,
+            COUNT(DISTINCT cr.id) AS classCount,
+            COUNT(DISTINCT s.id) AS studentCount
+        FROM college col
+        LEFT JOIN class_room cr ON cr.college_id = col.id
+        LEFT JOIN student s ON s.class_id = cr.id
+        WHERE col.id = #{collegeId}
+        GROUP BY col.id, col.name, col.code, col.description, col.dean, col.phone, col.create_time
+    </select>
+
+</mapper>

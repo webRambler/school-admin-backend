@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.school.mapper.ScoreMapper">
+
+    <!-- 新增成绩 -->
+    <insert id="insertScore" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO score (student_id, course_id, score, exam_type, create_time, update_time)
+        VALUES (#{studentId}, #{courseId}, #{score}, #{examType}, NOW(), NOW())
+    </insert>
+
+    <!-- 查询所有成绩 -->
+    <select id="selectAllScores" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score
+    </select>
+
+    <!-- 根据ID查询成绩 -->
+    <select id="selectScoreById" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score WHERE id = #{id}
+    </select>
+
+    <!-- 根据学生ID查询成绩 -->
+    <select id="selectScoresByStudentId" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score WHERE student_id = #{studentId}
+    </select>
+
+    <!-- 根据课程ID查询成绩 -->
+    <select id="selectScoresByCourseId" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 根据学生ID和课程ID查询成绩 -->
+    <select id="selectScoreByStudentAndCourse" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time
+        FROM score WHERE student_id = #{studentId} AND course_id = #{courseId}
+    </select>
+
+    <!-- 根据学生ID、课程ID和考试类型查询成绩 -->
+    <select id="selectScoreByStudentCourseAndExamType" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time
+        FROM score WHERE student_id = #{studentId} AND course_id = #{courseId} AND exam_type = #{examType}
+    </select>
+
+    <!-- 根据考试类型查询成绩 -->
+    <select id="selectScoresByExamType" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score WHERE exam_type = #{examType}
+    </select>
+
+    <!-- 查询不及格成绩（分数 < 60） -->
+    <select id="selectFailedScores" resultType="Score">
+        SELECT id, student_id, course_id, score, exam_type, create_time, update_time FROM score WHERE score &lt; 60
+    </select>
+
+    <!-- 更新成绩 -->
+    <update id="updateScore">
+        UPDATE score
+        <set>
+            <if test="score != null">score = #{score},</if>
+            <if test="examType != null">exam_type = #{examType},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除成绩 -->
+    <delete id="deleteScore">
+        DELETE FROM score WHERE id = #{id}
+    </delete>
+
+    <!-- 根据学生ID删除所有成绩 -->
+    <delete id="deleteScoresByStudentId">
+        DELETE FROM score WHERE student_id = #{studentId}
+    </delete>
+
+    <!-- 根据课程ID删除所有成绩 -->
+    <delete id="deleteScoresByCourseId">
+        DELETE FROM score WHERE course_id = #{courseId}
+    </delete>
+
+    <!-- ====== 连接查询 ====== -->
+
+    <!-- 获取成绩详情（三表连接：score + student + course） -->
+    <select id="selectScoreDetail" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        WHERE sc.id = #{scoreId}
+    </select>
+
+    <!-- 根据学生ID查询成绩详情列表 -->
+    <select id="selectScoreDetailsByStudentId" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        WHERE sc.student_id = #{studentId}
+        ORDER BY sc.score DESC
+    </select>
+
+    <!-- 根据课程ID查询成绩详情列表 -->
+    <select id="selectScoreDetailsByCourseId" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        WHERE sc.course_id = #{courseId}
+        ORDER BY sc.score DESC
+    </select>
+
+    <!-- 查询所有成绩详情 -->
+    <select id="selectAllScoreDetails" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        ORDER BY sc.create_time DESC
+    </select>
+
+    <!-- 查询不及格成绩详情 -->
+    <select id="selectFailedScoreDetails" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        WHERE sc.score &lt; 60
+        ORDER BY sc.score ASC
+    </select>
+
+    <!-- 根据考试类型查询成绩详情 -->
+    <select id="selectScoreDetailsByExamType" resultType="ScoreDetailVO">
+        SELECT
+            sc.id AS scoreId, sc.score, sc.exam_type, sc.create_time AS scoreCreateTime,
+            s.id AS studentId, s.name AS studentName, s.gender, s.phone,
+            c.id AS courseId, c.name AS courseName, c.credit, c.hours
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN course c ON sc.course_id = c.id
+        WHERE sc.exam_type = #{examType}
+        ORDER BY sc.score DESC
+    </select>
+
+    <!-- 课程成绩排名（按课程ID，分数降序） -->
+    <select id="selectScoreRankingByCourseId" resultType="ScoreRankVO">
+        SELECT
+            (@rank := @rank + 1) AS rank,
+            s.id AS studentId,
+            s.name AS studentName,
+            cr.name AS className,
+            sc.score
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN class_room cr ON s.class_id = cr.id,
+        (SELECT @rank := 0) r
+        WHERE sc.course_id = #{courseId}
+        ORDER BY sc.score DESC
+    </select>
+
+    <!-- 班级课程成绩排名（按班级ID和课程ID，分数降序） -->
+    <select id="selectScoreRankingByClassAndCourse" resultType="ScoreRankVO">
+        SELECT
+            (@rank := @rank + 1) AS rank,
+            s.id AS studentId,
+            s.name AS studentName,
+            cr.name AS className,
+            sc.score
+        FROM score sc
+        INNER JOIN student s ON sc.student_id = s.id
+        INNER JOIN class_room cr ON s.class_id = cr.id,
+        (SELECT @rank := 0) r
+        WHERE sc.course_id = #{courseId} AND s.class_id = #{classId}
+        ORDER BY sc.score DESC
+    </select>
+
+</mapper>
