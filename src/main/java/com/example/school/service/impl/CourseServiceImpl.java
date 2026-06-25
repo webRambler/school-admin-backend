@@ -72,6 +72,9 @@ public class CourseServiceImpl implements ICourseService {
     @Override
     public Course updateCourse(Long id, Course courseDetails) {
         Course course = getCourseById(id);
+        if (courseDetails.getTeacherId() != null) {
+            course.setTeacherId(courseDetails.getTeacherId());
+        }
         if (courseDetails.getName() != null) {
             course.setName(courseDetails.getName());
         }

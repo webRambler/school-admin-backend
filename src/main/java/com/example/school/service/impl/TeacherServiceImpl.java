@@ -58,11 +58,6 @@ public class TeacherServiceImpl implements ITeacherService {
     }
 
     @Override
-    public List<Teacher> getTeachersByDepartment(String department) {
-        return teacherMapper.selectTeachersByDepartment(department);
-    }
-
-    @Override
     public List<Teacher> getTeachersByTitle(String title) {
         return teacherMapper.selectTeachersByTitle(title);
     }
@@ -70,6 +65,9 @@ public class TeacherServiceImpl implements ITeacherService {
     @Override
     public Teacher updateTeacher(Long id, Teacher teacherDetails) {
         Teacher teacher = getTeacherById(id);
+        if (teacherDetails.getCollegeId() != null) {
+            teacher.setCollegeId(teacherDetails.getCollegeId());
+        }
         if (teacherDetails.getName() != null) {
             teacher.setName(teacherDetails.getName());
         }
@@ -81,9 +79,6 @@ public class TeacherServiceImpl implements ITeacherService {
         }
         if (teacherDetails.getTitle() != null) {
             teacher.setTitle(teacherDetails.getTitle());
-        }
-        if (teacherDetails.getDepartment() != null) {
-            teacher.setDepartment(teacherDetails.getDepartment());
         }
         if (teacherDetails.getPhone() != null) {
             teacher.setPhone(teacherDetails.getPhone());

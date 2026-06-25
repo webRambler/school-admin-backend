@@ -12,6 +12,8 @@ public class CourseStatisticsVO {
     private Long courseId;
     private String courseName;
     private BigDecimal credit;
+    private Long teacherId;
+    private String teacherName;
     private Long studentCount;
     private BigDecimal avgScore;
     private BigDecimal maxScore;

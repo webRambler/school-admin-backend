@@ -20,9 +20,6 @@ public interface TeacherMapper {
     // 根据姓名模糊查询教师
     List<Teacher> selectTeachersByName(String name);
 
-    // 根据院系查询教师
-    List<Teacher> selectTeachersByDepartment(String department);
-
     // 根据职称查询教师
     List<Teacher> selectTeachersByTitle(String title);
 

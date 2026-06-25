@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class Course {
 
     private Long id;
+    private Long teacherId;
     private String name;
     private BigDecimal credit;
     private Integer hours;

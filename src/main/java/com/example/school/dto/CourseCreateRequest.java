@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 @Data
 public class CourseCreateRequest {
 
+    private Long teacherId;
+
     @NotBlank(message = "课程名称不能为空")
     @Size(max = 50, message = "课程名称不能超过50个字符")
     private String name;

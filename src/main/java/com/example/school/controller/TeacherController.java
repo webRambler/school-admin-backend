@@ -55,12 +55,6 @@ public class TeacherController {
         return Result.success(teacherService.getTeachersByName(name));
     }
 
-    // 查：按院系查询教师
-    @GetMapping("/department/{department}")
-    public Result<List<Teacher>> getTeachersByDepartment(@PathVariable String department) {
-        return Result.success(teacherService.getTeachersByDepartment(department));
-    }
-
     // 查：按职称查询教师
     @GetMapping("/title/{title}")
     public Result<List<Teacher>> getTeachersByTitle(@PathVariable String title) {

@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 @Data
 public class CourseUpdateRequest {
 
+    private Long teacherId;
+
     @Size(max = 50, message = "课程名称不能超过50个字符")
     private String name;
 

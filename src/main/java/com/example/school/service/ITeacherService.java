@@ -18,9 +18,6 @@ public interface ITeacherService {
     // 根据姓名模糊查询教师
     List<Teacher> getTeachersByName(String name);
 
-    // 根据院系查询教师
-    List<Teacher> getTeachersByDepartment(String department);
-
     // 根据职称查询教师
     List<Teacher> getTeachersByTitle(String title);
 
