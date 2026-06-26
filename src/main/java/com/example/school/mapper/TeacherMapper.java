@@ -2,6 +2,7 @@ package com.example.school.mapper;
 
 import com.example.school.entity.Teacher;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public interface TeacherMapper {
 
     // 根据职称查询教师
     List<Teacher> selectTeachersByTitle(String title);
+
+    // 多条件查询教师（姓名模糊 + 学院ID可选）
+    List<Teacher> searchTeachers(@Param("name") String name, @Param("collegeId") Long collegeId);
 
     // 更新教师
     int updateTeacher(Teacher teacher);

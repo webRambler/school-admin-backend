@@ -63,11 +63,13 @@ public class TeacherServiceImpl implements ITeacherService {
     }
 
     @Override
+    public List<Teacher> searchTeachers(String name, Long collegeId) {
+        return teacherRepository.searchTeachers(name, collegeId);
+    }
+
+    @Override
     public Teacher updateTeacher(Long id, Teacher teacherDetails) {
         Teacher teacher = getTeacherById(id);
-        if (teacherDetails.getCollegeId() != null) {
-            teacher.setCollegeId(teacherDetails.getCollegeId());
-        }
         if (teacherDetails.getName() != null) {
             teacher.setName(teacherDetails.getName());
         }

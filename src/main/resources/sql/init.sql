@@ -1,11 +1,12 @@
 -- ============================================
 -- 学校管理系统 - 数据库初始化脚本
 -- 数据库：school
--- 表：college, class_room, teacher, course, student, score
+-- 表：college, teacher, college_teacher, class_room, course, student, score
 -- 关系：
 --   college 1:N class_room (一个学院有多个班级)
+--   college 1:N teacher    (通过college_teacher关系表，一个学院可以有多个教师)
+--   class_room N:1 teacher  (班级的班主任由一名教师担任)
 --   class_room 1:N student (一个班级有多个学生)
---   college 1:N teacher    (一个学院有多个教师)
 --   teacher 1:N course     (一个教师可以教多门课程)
 --   student N:M course     (通过score表实现多对多)
 --   student 1:N score      (一个学生有多门成绩)
@@ -23,8 +24,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `score`;
 DROP TABLE IF EXISTS `student`;
 DROP TABLE IF EXISTS `course`;
-DROP TABLE IF EXISTS `teacher`;
 DROP TABLE IF EXISTS `class_room`;
+DROP TABLE IF EXISTS `college_teacher`;
+DROP TABLE IF EXISTS `teacher`;
 DROP TABLE IF EXISTS `college`;
 DROP TABLE IF EXISTS `user`;
 
@@ -34,7 +36,6 @@ CREATE TABLE `college` (
     `name` VARCHAR(50) NOT NULL COMMENT '学院名称',
     `code` VARCHAR(20) NOT NULL COMMENT '学院代码',
     `description` VARCHAR(200) DEFAULT NULL COMMENT '学院简介',
-    `dean` VARCHAR(20) DEFAULT NULL COMMENT '院长',
     `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -43,27 +44,9 @@ CREATE TABLE `college` (
     KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学院表';
 
--- 班级表
-CREATE TABLE `class_room` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '班级ID',
-    `college_id` BIGINT DEFAULT NULL COMMENT '学院ID',
-    `name` VARCHAR(50) NOT NULL COMMENT '班级名称',
-    `grade` VARCHAR(20) NOT NULL COMMENT '年级',
-    `major` VARCHAR(50) NOT NULL COMMENT '专业',
-    `teacher` VARCHAR(20) DEFAULT NULL COMMENT '班主任',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY `idx_college_id` (`college_id`),
-    KEY `idx_grade` (`grade`),
-    KEY `idx_major` (`major`),
-    CONSTRAINT `fk_classroom_college` FOREIGN KEY (`college_id`) REFERENCES `college` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='班级表';
-
 -- 教师表
 CREATE TABLE `teacher` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '教师ID',
-    `college_id` BIGINT DEFAULT NULL COMMENT '所属学院ID',
     `name` VARCHAR(20) NOT NULL COMMENT '姓名',
     `gender` VARCHAR(5) NOT NULL COMMENT '性别',
     `age` INT NOT NULL COMMENT '年龄',
@@ -73,10 +56,43 @@ CREATE TABLE `teacher` (
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY `idx_college_id` (`college_id`),
-    KEY `idx_name` (`name`),
-    CONSTRAINT `fk_teacher_college` FOREIGN KEY (`college_id`) REFERENCES `college` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+    KEY `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='教师表';
+
+-- 学院教师关系表
+CREATE TABLE `college_teacher` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '关系ID',
+    `college_id` BIGINT NOT NULL COMMENT '学院ID',
+    `teacher_id` BIGINT NOT NULL COMMENT '教师ID',
+    `is_dean` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否为院长(0:否 1:是)',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_college_teacher` (`college_id`, `teacher_id`),
+    KEY `idx_college_id` (`college_id`),
+    KEY `idx_teacher_id` (`teacher_id`),
+    CONSTRAINT `fk_ct_college` FOREIGN KEY (`college_id`) REFERENCES `college` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_ct_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学院教师关系表';
+
+-- 班级表
+CREATE TABLE `class_room` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '班级ID',
+    `college_id` BIGINT DEFAULT NULL COMMENT '学院ID',
+    `name` VARCHAR(50) NOT NULL COMMENT '班级名称',
+    `grade` VARCHAR(20) NOT NULL COMMENT '年级',
+    `major` VARCHAR(50) NOT NULL COMMENT '专业',
+    `homeroom_teacher_id` BIGINT DEFAULT NULL COMMENT '班主任教师ID',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_college_id` (`college_id`),
+    KEY `idx_grade` (`grade`),
+    KEY `idx_major` (`major`),
+    KEY `idx_homeroom_teacher_id` (`homeroom_teacher_id`),
+    CONSTRAINT `fk_classroom_college` FOREIGN KEY (`college_id`) REFERENCES `college` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT `fk_classroom_homeroom_teacher` FOREIGN KEY (`homeroom_teacher_id`) REFERENCES `teacher` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='班级表';
 
 -- 课程表
 CREATE TABLE `course` (
@@ -151,31 +167,45 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================
 
 -- 学院数据
-INSERT INTO `college` (`name`, `code`, `description`, `dean`, `phone`) VALUES
-('计算机与信息工程学院', 'CS', '负责计算机科学、软件工程等专业的教学与科研', '刘院长', '010-12345001'),
-('软件学院', 'SE', '负责软件工程专业的教学与科研', '陈院长', '010-12345002'),
-('大数据学院', 'DS', '负责数据科学与大数据技术专业的教学与科研', '张院长', '010-12345003'),
-('人工智能学院', 'AI', '负责人工智能专业的教学与科研', '王院长', '010-12345004');
+INSERT INTO `college` (`name`, `code`, `description`, `phone`) VALUES
+('计算机与信息工程学院', 'CS', '负责计算机科学、软件工程等专业的教学与科研', '010-12345001'),
+('软件学院', 'SE', '负责软件工程专业的教学与科研', '010-12345002'),
+('大数据学院', 'DS', '负责数据科学与大数据技术专业的教学与科研', '010-12345003'),
+('人工智能学院', 'AI', '负责人工智能专业的教学与科研', '010-12345004');
 
--- 班级数据
-INSERT INTO `class_room` (`college_id`, `name`, `grade`, `major`, `teacher`) VALUES
-('1', '计算机2301班', '2023级', '计算机科学与技术', '张老师'),
-('1', '计算机2302班', '2023级', '计算机科学与技术', '李老师'),
-('2', '软件2301班', '2023级', '软件工程', '王老师'),
-('3', '数据2301班', '2023级', '数据科学与大数据技术', '赵老师'),
-('4', '人工智能2301班', '2023级', '人工智能', '錢老师');
+-- 教师数据
+INSERT INTO `teacher` (`name`, `gender`, `age`, `title`, `phone`, `email`) VALUES
+('张建国', '男', 45, '教授', '13900001001', 'zhangjg@school.edu'),
+('李秀英', '女', 38, '副教授', '13900001002', 'lixye@school.edu'),
+('王志强', '男', 52, '教授', '13900001003', 'wangzq@school.edu'),
+('赵美华', '女', 35, '讲师', '13900001004', 'zhaomh@school.edu'),
+('孙国栋', '男', 41, '副教授', '13900001005', 'sungd@school.edu'),
+('周丽娟', '女', 29, '讲师', '13900001006', 'zhoulj@school.edu'),
+('吴大伟', '男', 48, '教授', '13900001007', 'wudw@school.edu'),
+('郑小燕', '女', 33, '讲师', '13900001008', 'zhengxy@school.edu');
 
--- 教师数据（college_id 关联所属学院）
+-- 学院教师关系数据
 -- 学院对应：1-计算机与信息工程学院 2-软件学院 3-大数据学院 4-人工智能学院
-INSERT INTO `teacher` (`college_id`, `name`, `gender`, `age`, `title`, `phone`, `email`) VALUES
-(1, '张建国', '男', 45, '教授', '13900001001', 'zhangjg@school.edu'),
-(1, '李秀英', '女', 38, '副教授', '13900001002', 'lixye@school.edu'),
-(2, '王志强', '男', 52, '教授', '13900001003', 'wangzq@school.edu'),
-(1, '赵美华', '女', 35, '讲师', '13900001004', 'zhaomh@school.edu'),
-(3, '孙国栋', '男', 41, '副教授', '13900001005', 'sungd@school.edu'),
-(4, '周丽娟', '女', 29, '讲师', '13900001006', 'zhoulj@school.edu'),
-(2, '吴大伟', '男', 48, '教授', '13900001007', 'wudw@school.edu'),
-(1, '郑小燕', '女', 33, '讲师', '13900001008', 'zhengxy@school.edu');
+-- 教师对应：1-张建国 2-李秀英 3-王志强 4-赵美华 5-孙国栋 6-周丽娟 7-吴大伟 8-郑小燕
+-- is_dean=1 表示院长
+INSERT INTO `college_teacher` (`college_id`, `teacher_id`, `is_dean`) VALUES
+(1, 1, 1),  -- 计算机学院 - 张建国(院长)
+(1, 2, 0),  -- 计算机学院 - 李秀英
+(1, 4, 0),  -- 计算机学院 - 赵美华
+(1, 8, 0),  -- 计算机学院 - 郑小燕
+(2, 3, 1),  -- 软件学院 - 王志强(院长)
+(2, 7, 0),  -- 软件学院 - 吴大伟
+(3, 5, 1),  -- 大数据学院 - 孙国栋(院长)
+(4, 6, 1);  -- 人工智能学院 - 周丽娟(院长)
+
+-- 班级数据（homeroom_teacher_id 关联班主任）
+-- 班主任对应：1-张建国 2-李秀英 3-王志强 5-孙国栋 6-周丽娟
+INSERT INTO `class_room` (`college_id`, `name`, `grade`, `major`, `homeroom_teacher_id`) VALUES
+('1', '计算机2301班', '2023级', '计算机科学与技术', 1),
+('1', '计算机2302班', '2023级', '计算机科学与技术', 2),
+('2', '软件2301班', '2023级', '软件工程', 3),
+('3', '数据2301班', '2023级', '数据科学与大数据技术', 5),
+('4', '人工智能2301班', '2023级', '人工智能', 6);
 
 -- 课程数据（teacher_id 关联授课教师）
 -- 教师对应：1-张建国 2-李秀英 3-王志强 4-赵美华 5-孙国栋 6-周丽娟 7-吴大伟 8-郑小燕

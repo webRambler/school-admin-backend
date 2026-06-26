@@ -4,33 +4,33 @@
 
     <!-- 新增班级 -->
     <insert id="insertClassRoom" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO class_room (college_id, name, grade, major, teacher, create_time, update_time)
-        VALUES (#{collegeId}, #{name}, #{grade}, #{major}, #{teacher}, NOW(), NOW())
+        INSERT INTO class_room (college_id, name, grade, major, homeroom_teacher_id, create_time, update_time)
+        VALUES (#{collegeId}, #{name}, #{grade}, #{major}, #{homeroomTeacherId}, NOW(), NOW())
     </insert>
 
     <!-- 查询所有班级 -->
     <select id="selectAllClassRooms" resultType="ClassRoom">
-        SELECT id, college_id, name, grade, major, teacher, create_time, update_time FROM class_room
+        SELECT id, college_id, name, grade, major, homeroom_teacher_id, create_time, update_time FROM class_room
     </select>
 
     <!-- 根据ID查询班级 -->
     <select id="selectClassRoomById" resultType="ClassRoom">
-        SELECT id, college_id, name, grade, major, teacher, create_time, update_time FROM class_room WHERE id = #{id}
+        SELECT id, college_id, name, grade, major, homeroom_teacher_id, create_time, update_time FROM class_room WHERE id = #{id}
     </select>
 
     <!-- 根据名称模糊查询班级 -->
     <select id="selectClassRoomsByName" resultType="ClassRoom">
-        SELECT id, college_id, name, grade, major, teacher, create_time, update_time FROM class_room WHERE name LIKE CONCAT('%', #{name}, '%')
+        SELECT id, college_id, name, grade, major, homeroom_teacher_id, create_time, update_time FROM class_room WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
 
     <!-- 根据年级查询班级 -->
     <select id="selectClassRoomsByGrade" resultType="ClassRoom">
-        SELECT id, college_id, name, grade, major, teacher, create_time, update_time FROM class_room WHERE grade = #{grade}
+        SELECT id, college_id, name, grade, major, homeroom_teacher_id, create_time, update_time FROM class_room WHERE grade = #{grade}
     </select>
 
     <!-- 根据专业查询班级 -->
     <select id="selectClassRoomsByMajor" resultType="ClassRoom">
-        SELECT id, college_id, name, grade, major, teacher, create_time, update_time FROM class_room WHERE major LIKE CONCAT('%', #{major}, '%')
+        SELECT id, college_id, name, grade, major, homeroom_teacher_id, create_time, update_time FROM class_room WHERE major LIKE CONCAT('%', #{major}, '%')
     </select>
 
     <!-- 更新班级 -->
@@ -41,7 +41,7 @@
             <if test="name != null">name = #{name},</if>
             <if test="grade != null">grade = #{grade},</if>
             <if test="major != null">major = #{major},</if>
-            <if test="teacher != null">teacher = #{teacher},</if>
+            <if test="homeroomTeacherId != null">homeroom_teacher_id = #{homeroomTeacherId},</if>
             update_time = NOW()
         </set>
         WHERE id = #{id}

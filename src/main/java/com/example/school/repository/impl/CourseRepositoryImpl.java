@@ -4,6 +4,7 @@ import com.example.school.entity.Course;
 import com.example.school.mapper.CourseMapper;
 import com.example.school.repository.ICourseRepository;
 import com.example.school.vo.CourseStatisticsVO;
+import com.example.school.vo.CourseWithTeacherVO;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -46,6 +47,11 @@ public class CourseRepositoryImpl implements ICourseRepository {
     @Override
     public List<Course> selectCoursesBySemester(String semester) {
         return courseMapper.selectCoursesBySemester(semester);
+    }
+
+    @Override
+    public List<CourseWithTeacherVO> searchCourses(String name, String teacherName, BigDecimal credit) {
+        return courseMapper.searchCourses(name, teacherName, credit);
     }
 
     @Override

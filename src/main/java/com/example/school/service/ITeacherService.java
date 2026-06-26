@@ -21,6 +21,9 @@ public interface ITeacherService {
     // 根据职称查询教师
     List<Teacher> getTeachersByTitle(String title);
 
+    // 多条件查询教师（姓名模糊 + 学院ID可选）
+    List<Teacher> searchTeachers(String name, Long collegeId);
+
     // 更新教师信息
     Teacher updateTeacher(Long id, Teacher teacherDetails);
 

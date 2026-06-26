@@ -2,6 +2,7 @@ package com.example.school.service;
 
 import com.example.school.entity.Course;
 import com.example.school.vo.CourseStatisticsVO;
+import com.example.school.vo.CourseWithTeacherVO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,6 +20,8 @@ public interface ICourseService {
     List<Course> getCoursesByCredit(BigDecimal credit);
 
     List<Course> getCoursesBySemester(String semester);
+
+    List<CourseWithTeacherVO> searchCourses(String name, String teacherName, BigDecimal credit);
 
     Course updateCourse(Long id, Course courseDetails);
 

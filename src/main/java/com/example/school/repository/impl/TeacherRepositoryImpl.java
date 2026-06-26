@@ -42,6 +42,11 @@ public class TeacherRepositoryImpl implements ITeacherRepository {
     }
 
     @Override
+    public List<Teacher> searchTeachers(String name, Long collegeId) {
+        return teacherMapper.searchTeachers(name, collegeId);
+    }
+
+    @Override
     public int updateTeacher(Teacher teacher) {
         return teacherMapper.updateTeacher(teacher);
     }

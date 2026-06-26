@@ -10,7 +10,6 @@ public class College {
     private String name;
     private String code;
     private String description;
-    private String dean;
     private String phone;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

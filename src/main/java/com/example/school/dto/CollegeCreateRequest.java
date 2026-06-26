@@ -19,9 +19,6 @@ public class CollegeCreateRequest {
     @Size(max = 200, message = "学院简介不能超过200个字符")
     private String description;
 
-    @Size(max = 20, message = "院长姓名不能超过20个字符")
-    private String dean;
-
     @Size(max = 20, message = "联系电话不能超过20个字符")
     private String phone;
 }

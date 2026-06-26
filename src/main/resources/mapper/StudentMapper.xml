@@ -61,7 +61,7 @@
         SELECT
             s.id, s.name, s.gender, s.age, s.class_id, s.phone, s.email,
             s.create_time, s.update_time,
-            cr.name AS className, cr.grade, cr.major, cr.teacher
+            cr.name AS className, cr.grade, cr.major, cr.homeroom_teacher_id AS homeroomTeacherId
         FROM student s
         LEFT JOIN class_room cr ON s.class_id = cr.id
         WHERE s.id = #{studentId}
@@ -72,7 +72,7 @@
         SELECT
             s.id, s.name, s.gender, s.age, s.class_id, s.phone, s.email,
             s.create_time, s.update_time,
-            cr.name AS className, cr.grade, cr.major, cr.teacher
+            cr.name AS className, cr.grade, cr.major, cr.homeroom_teacher_id AS homeroomTeacherId
         FROM student s
         LEFT JOIN class_room cr ON s.class_id = cr.id
         WHERE s.class_id = #{classId}
@@ -83,7 +83,7 @@
         SELECT
             s.id, s.name, s.gender, s.age, s.class_id, s.phone, s.email,
             s.create_time, s.update_time,
-            cr.name AS className, cr.grade, cr.major, cr.teacher
+            cr.name AS className, cr.grade, cr.major, cr.homeroom_teacher_id AS homeroomTeacherId
         FROM student s
         LEFT JOIN class_room cr ON s.class_id = cr.id
     </select>
@@ -109,7 +109,7 @@
         SELECT
             s.id, s.name, s.gender, s.age, s.class_id, s.phone, s.email,
             s.create_time, s.update_time,
-            cr.name AS className, cr.grade, cr.major, cr.teacher
+            cr.name AS className, cr.grade, cr.major, cr.homeroom_teacher_id AS homeroomTeacherId
         FROM student s
         LEFT JOIN class_room cr ON s.class_id = cr.id
         <where>

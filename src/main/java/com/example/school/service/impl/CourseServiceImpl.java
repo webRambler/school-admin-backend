@@ -7,6 +7,7 @@ import com.example.school.repository.ICourseRepository;
 import com.example.school.service.ICourseService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.CourseStatisticsVO;
+import com.example.school.vo.CourseWithTeacherVO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -67,6 +68,11 @@ public class CourseServiceImpl implements ICourseService {
     @Override
     public List<Course> getCoursesBySemester(String semester) {
         return courseRepository.selectCoursesBySemester(semester);
+    }
+
+    @Override
+    public List<CourseWithTeacherVO> searchCourses(String name, String teacherName, BigDecimal credit) {
+        return courseRepository.searchCourses(name, teacherName, credit);
     }
 
     @Override

@@ -24,5 +24,5 @@ public class StudentWithClassVO {
     private String className;
     private String grade;
     private String major;
-    private String teacher;
+    private Long homeroomTeacherId;
 }

@@ -16,6 +16,8 @@ public interface ITeacherRepository {
 
     List<Teacher> selectTeachersByTitle(String title);
 
+    List<Teacher> searchTeachers(String name, Long collegeId);
+
     int updateTeacher(Teacher teacher);
 
     int deleteTeacher(Long id);

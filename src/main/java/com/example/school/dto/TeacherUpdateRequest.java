@@ -7,8 +7,6 @@ import javax.validation.constraints.*;
 @Data
 public class TeacherUpdateRequest {
 
-    private Long collegeId;
-
     @Size(max = 20, message = "姓名不能超过20个字符")
     private String name;
 

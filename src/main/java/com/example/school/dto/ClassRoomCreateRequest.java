@@ -24,6 +24,5 @@ public class ClassRoomCreateRequest {
     @Size(max = 50, message = "专业不能超过50个字符")
     private String major;
 
-    @Size(max = 20, message = "班主任姓名不能超过20个字符")
-    private String teacher;
+    private Long homeroomTeacherId;
 }

@@ -11,7 +11,7 @@ public class ClassRoom {
     private String name;
     private String grade;
     private String major;
-    private String teacher;
+    private Long homeroomTeacherId;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

@@ -49,10 +49,12 @@ public class TeacherController {
         return Result.success(teacherService.getTeacherById(id));
     }
 
-    // 查：按姓名模糊搜索教师
+    // 查：多条件查询教师（姓名模糊 + 学院ID可选）
     @GetMapping("/search")
-    public Result<List<Teacher>> getTeachersByName(@RequestParam String name) {
-        return Result.success(teacherService.getTeachersByName(name));
+    public Result<List<Teacher>> searchTeachers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long collegeId) {
+        return Result.success(teacherService.searchTeachers(name, collegeId));
     }
 
     // 查：按职称查询教师

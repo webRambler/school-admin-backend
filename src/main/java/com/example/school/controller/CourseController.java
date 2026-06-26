@@ -7,6 +7,7 @@ import com.example.school.dto.CourseUpdateRequest;
 import com.example.school.entity.Course;
 import com.example.school.service.ICourseService;
 import com.example.school.vo.CourseStatisticsVO;
+import com.example.school.vo.CourseWithTeacherVO;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -51,22 +52,16 @@ public class CourseController {
         return Result.success(courseService.getCourseById(id));
     }
 
-    // 查：按名称模糊搜索课程
+    // 查：多条件查询课程（课程名称模糊、教师姓名模糊、学分精确）
     @GetMapping("/search")
-    public Result<List<Course>> getCoursesByName(@RequestParam String name) {
-        return Result.success(courseService.getCoursesByName(name));
-    }
-
-    // 查：按学分查询课程
-    @GetMapping("/credit/{credit}")
-    public Result<List<Course>> getCoursesByCredit(@PathVariable BigDecimal credit) {
-        return Result.success(courseService.getCoursesByCredit(credit));
-    }
-
-    // 查：按学期查询课程
-    @GetMapping("/semester/{semester}")
-    public Result<List<Course>> getCoursesBySemester(@PathVariable String semester) {
-        return Result.success(courseService.getCoursesBySemester(semester));
+    public Result<PageResult<CourseWithTeacherVO>> searchCourses(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String teacherName,
+            @RequestParam(required = false) BigDecimal credit,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(courseService.searchCourses(name, teacherName, credit)));
     }
 
     // 改：更新课程

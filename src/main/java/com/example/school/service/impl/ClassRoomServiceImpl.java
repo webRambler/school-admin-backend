@@ -85,8 +85,8 @@ public class ClassRoomServiceImpl implements IClassRoomService {
         if (classRoomDetails.getMajor() != null) {
             classRoom.setMajor(classRoomDetails.getMajor());
         }
-        if (classRoomDetails.getTeacher() != null) {
-            classRoom.setTeacher(classRoomDetails.getTeacher());
+        if (classRoomDetails.getHomeroomTeacherId() != null) {
+            classRoom.setHomeroomTeacherId(classRoomDetails.getHomeroomTeacherId());
         }
         classRoomRepository.updateClassRoom(classRoom);
         redisService.set(CLASSROOM_KEY_PREFIX + id, classRoom, CLASSROOM_CACHE_TTL, TimeUnit.MINUTES);

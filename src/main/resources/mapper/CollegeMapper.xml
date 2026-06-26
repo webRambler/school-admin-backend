@@ -4,13 +4,13 @@
 
     <!-- 新增学院 -->
     <insert id="insertCollege" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO college (name, code, description, dean, phone, create_time, update_time)
-        VALUES (#{name}, #{code}, #{description}, #{dean}, #{phone}, NOW(), NOW())
+        INSERT INTO college (name, code, description, phone, create_time, update_time)
+        VALUES (#{name}, #{code}, #{description}, #{phone}, NOW(), NOW())
     </insert>
 
     <!-- 查询所有学院 -->
     <select id="selectAllColleges" resultType="College">
-        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college
+        SELECT id, name, code, description, phone, create_time, update_time FROM college
     </select>
 
     <!-- 根据ID查询学院 -->
@@ -20,7 +20,7 @@
 
     <!-- 根据名称模糊查询学院 -->
     <select id="selectCollegesByName" resultType="College">
-        SELECT id, name, code, description, dean, phone, create_time, update_time
+        SELECT id, name, code, description, phone, create_time, update_time
         FROM college WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
 
@@ -36,7 +36,6 @@
             <if test="name != null">name = #{name},</if>
             <if test="code != null">code = #{code},</if>
             <if test="description != null">description = #{description},</if>
-            <if test="dean != null">dean = #{dean},</if>
             <if test="phone != null">phone = #{phone},</if>
             update_time = NOW()
         </set>
@@ -60,7 +59,6 @@
             col.name AS collegeName,
             col.code AS collegeCode,
             col.description,
-            col.dean,
             col.phone,
             col.create_time,
             COUNT(DISTINCT cr.id) AS classCount,
@@ -69,7 +67,7 @@
         LEFT JOIN class_room cr ON cr.college_id = col.id
         LEFT JOIN student s ON s.class_id = cr.id
         WHERE col.id = #{collegeId}
-        GROUP BY col.id, col.name, col.code, col.description, col.dean, col.phone, col.create_time
+        GROUP BY col.id, col.name, col.code, col.description, col.phone, col.create_time
     </select>
 
 </mapper>

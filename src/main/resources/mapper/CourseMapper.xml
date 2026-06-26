@@ -33,6 +33,28 @@
         SELECT id, teacher_id, name, credit, hours, semester, create_time, update_time FROM course WHERE semester = #{semester}
     </select>
 
+    <!-- 多条件查询课程（关联教师姓名） -->
+    <select id="searchCourses" resultType="CourseWithTeacherVO">
+        SELECT
+            c.id, c.teacher_id, c.name, c.credit, c.hours, c.semester,
+            c.create_time, c.update_time,
+            t.name AS teacherName
+        FROM course c
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        <where>
+            <if test="name != null and name != ''">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="teacherName != null and teacherName != ''">
+                AND t.name LIKE CONCAT('%', #{teacherName}, '%')
+            </if>
+            <if test="credit != null">
+                AND c.credit = #{credit}
+            </if>
+        </where>
+        ORDER BY c.id ASC
+    </select>
+
     <!-- 更新课程 -->
     <update id="updateCourse">
         UPDATE course

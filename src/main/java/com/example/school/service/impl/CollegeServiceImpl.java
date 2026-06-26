@@ -89,9 +89,6 @@ public class CollegeServiceImpl implements ICollegeService {
         if (collegeDetails.getDescription() != null) {
             college.setDescription(collegeDetails.getDescription());
         }
-        if (collegeDetails.getDean() != null) {
-            college.setDean(collegeDetails.getDean());
-        }
         if (collegeDetails.getPhone() != null) {
             college.setPhone(collegeDetails.getPhone());
         }

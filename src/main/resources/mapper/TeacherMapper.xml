@@ -4,39 +4,57 @@
 
     <!-- 新增教师 -->
     <insert id="insertTeacher" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO teacher (college_id, name, gender, age, title, phone, email, create_time, update_time)
-        VALUES (#{collegeId}, #{name}, #{gender}, #{age}, #{title}, #{phone}, #{email}, NOW(), NOW())
+        INSERT INTO teacher (name, gender, age, title, phone, email, create_time, update_time)
+        VALUES (#{name}, #{gender}, #{age}, #{title}, #{phone}, #{email}, NOW(), NOW())
     </insert>
 
     <!-- 查询所有教师 -->
     <select id="selectAllTeachers" resultType="Teacher">
-        SELECT id, college_id, name, gender, age, title, phone, email, create_time, update_time FROM teacher
+        SELECT id, name, gender, age, title, phone, email, create_time, update_time FROM teacher
         ORDER BY id ASC
     </select>
 
     <!-- 根据ID查询教师 -->
     <select id="selectTeacherById" resultType="Teacher">
-        SELECT id, college_id, name, gender, age, title, phone, email, create_time, update_time
+        SELECT id, name, gender, age, title, phone, email, create_time, update_time
         FROM teacher WHERE id = #{id}
     </select>
 
     <!-- 根据姓名模糊查询教师 -->
     <select id="selectTeachersByName" resultType="Teacher">
-        SELECT id, college_id, name, gender, age, title, phone, email, create_time, update_time
+        SELECT id, name, gender, age, title, phone, email, create_time, update_time
         FROM teacher WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
 
     <!-- 根据职称查询教师 -->
     <select id="selectTeachersByTitle" resultType="Teacher">
-        SELECT id, college_id, name, gender, age, title, phone, email, create_time, update_time
+        SELECT id, name, gender, age, title, phone, email, create_time, update_time
         FROM teacher WHERE title = #{title}
+    </select>
+
+    <!-- 多条件查询教师（姓名模糊 + 学院ID可选） -->
+    <select id="searchTeachers" resultType="Teacher">
+        SELECT DISTINCT t.id, t.name, t.gender, t.age, t.title, t.phone, t.email,
+               t.create_time, t.update_time
+        FROM teacher t
+        <if test="collegeId != null">
+            INNER JOIN college_teacher ct ON t.id = ct.teacher_id
+        </if>
+        <where>
+            <if test="name != null and name != ''">
+                AND t.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="collegeId != null">
+                AND ct.college_id = #{collegeId}
+            </if>
+        </where>
+        ORDER BY t.id ASC
     </select>
 
     <!-- 更新教师 -->
     <update id="updateTeacher">
         UPDATE teacher
         <set>
-            <if test="collegeId != null">college_id = #{collegeId},</if>
             <if test="name != null">name = #{name},</if>
             <if test="gender != null">gender = #{gender},</if>
             <if test="age != null">age = #{age},</if>

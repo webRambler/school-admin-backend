@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 public class Teacher {
 
     private Long id;
-    private Long collegeId;
     private String name;
     private String gender;
     private Integer age;

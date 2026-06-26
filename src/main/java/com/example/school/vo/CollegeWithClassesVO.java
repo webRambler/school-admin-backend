@@ -15,7 +15,6 @@ public class CollegeWithClassesVO {
     private String collegeName;
     private String collegeCode;
     private String description;
-    private String dean;
     private String phone;
     private LocalDateTime createTime;
 
