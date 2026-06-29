@@ -4,6 +4,7 @@ import com.example.school.entity.College;
 import com.example.school.mapper.CollegeMapper;
 import com.example.school.repository.ICollegeRepository;
 import com.example.school.vo.CollegeWithClassesVO;
+import com.example.school.vo.CollegeWithDeanVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class CollegeRepositoryImpl implements ICollegeRepository {
     @Override
     public List<College> selectCollegesByName(String name) {
         return collegeMapper.selectCollegesByName(name);
+    }
+
+    @Override
+    public List<CollegeWithDeanVO> searchColleges(String name, String code) {
+        return collegeMapper.searchColleges(name, code);
     }
 
     @Override

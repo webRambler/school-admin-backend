@@ -15,7 +15,7 @@
 
     <!-- 根据ID查询学院 -->
     <select id="selectCollegeById" resultType="College">
-        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college WHERE id = #{id}
+        SELECT id, name, code, description, phone, create_time, update_time FROM college WHERE id = #{id}
     </select>
 
     <!-- 根据名称模糊查询学院 -->
@@ -24,9 +24,29 @@
         FROM college WHERE name LIKE CONCAT('%', #{name}, '%')
     </select>
 
+    <!-- 多条件查询学院（名称模糊、代码模糊，含院长信息） -->
+    <select id="searchColleges" resultType="CollegeWithDeanVO">
+        SELECT
+            c.id, c.name, c.code, c.description, c.phone,
+            c.create_time, c.update_time,
+            t.id AS deanId, t.name AS deanName, t.phone AS deanPhone
+        FROM college c
+        LEFT JOIN college_teacher ct ON c.id = ct.college_id AND ct.is_dean = 1
+        LEFT JOIN teacher t ON ct.teacher_id = t.id
+        <where>
+            <if test="name != null and name != ''">
+                AND c.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="code != null and code != ''">
+                AND c.code LIKE CONCAT('%', #{code}, '%')
+            </if>
+        </where>
+        ORDER BY c.id ASC
+    </select>
+
     <!-- 根据学院代码查询学院 -->
     <select id="selectCollegeByCode" resultType="College">
-        SELECT id, name, code, description, dean, phone, create_time, update_time FROM college WHERE code = #{code}
+        SELECT id, name, code, description, phone, create_time, update_time FROM college WHERE code = #{code}
     </select>
 
     <!-- 更新学院 -->

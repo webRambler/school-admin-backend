@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.school.mapper.CollegeTeacherMapper">
+
+    <!-- 插入关系记录 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO college_teacher (college_id, teacher_id, is_dean, create_time, update_time)
+        VALUES (#{collegeId}, #{teacherId}, #{isDean}, NOW(), NOW())
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultType="CollegeTeacher">
+        SELECT id, college_id, teacher_id, is_dean, create_time, update_time
+        FROM college_teacher
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据学院ID和教师ID精确查询 -->
+    <select id="selectByCollegeAndTeacher" resultType="CollegeTeacher">
+        SELECT id, college_id, teacher_id, is_dean, create_time, update_time
+        FROM college_teacher
+        WHERE college_id = #{collegeId} AND teacher_id = #{teacherId}
+    </select>
+
+    <!-- 查询某学院下所有教师关系（含教师姓名、职称） -->
+    <select id="selectByCollegeId" resultType="com.example.school.vo.CollegeTeacherVO">
+        SELECT
+            ct.id,
+            ct.college_id,
+            col.name AS collegeName,
+            ct.teacher_id,
+            t.name  AS teacherName,
+            t.title AS teacherTitle,
+            ct.is_dean,
+            ct.create_time,
+            ct.update_time
+        FROM college_teacher ct
+        LEFT JOIN college col ON col.id = ct.college_id
+        LEFT JOIN teacher t   ON t.id  = ct.teacher_id
+        WHERE ct.college_id = #{collegeId}
+        ORDER BY ct.is_dean DESC, ct.id ASC
+    </select>
+
+    <!-- 查询某教师关联的所有学院（含学院名称） -->
+    <select id="selectByTeacherId" resultType="com.example.school.vo.CollegeTeacherVO">
+        SELECT
+            ct.id,
+            ct.college_id,
+            col.name AS collegeName,
+            ct.teacher_id,
+            t.name  AS teacherName,
+            t.title AS teacherTitle,
+            ct.is_dean,
+            ct.create_time,
+            ct.update_time
+        FROM college_teacher ct
+        LEFT JOIN college col ON col.id = ct.college_id
+        LEFT JOIN teacher t   ON t.id  = ct.teacher_id
+        WHERE ct.teacher_id = #{teacherId}
+        ORDER BY ct.id ASC
+    </select>
+
+    <!-- 查询某学院的院长记录 -->
+    <select id="selectDeanByCollegeId" resultType="com.example.school.vo.CollegeTeacherVO">
+        SELECT
+            ct.id,
+            ct.college_id,
+            col.name AS collegeName,
+            ct.teacher_id,
+            t.name  AS teacherName,
+            t.title AS teacherTitle,
+            ct.is_dean,
+            ct.create_time,
+            ct.update_time
+        FROM college_teacher ct
+        LEFT JOIN college col ON col.id = ct.college_id
+        LEFT JOIN teacher t   ON t.id  = ct.teacher_id
+        WHERE ct.college_id = #{collegeId} AND ct.is_dean = 1
+        LIMIT 1
+    </select>
+
+    <!-- 更新 is_dean 字段 -->
+    <update id="updateIsDean">
+        UPDATE college_teacher
+        SET is_dean = #{isDean}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除关系记录 -->
+    <delete id="deleteById">
+        DELETE FROM college_teacher WHERE id = #{id}
+    </delete>
+
+    <!-- 根据学院ID删除所有关系 -->
+    <delete id="deleteByCollegeId">
+        DELETE FROM college_teacher WHERE college_id = #{collegeId}
+    </delete>
+
+    <!-- 根据教师ID删除所有关系 -->
+    <delete id="deleteByTeacherId">
+        DELETE FROM college_teacher WHERE teacher_id = #{teacherId}
+    </delete>
+
+    <!-- 统计学院下关联的教师数量 -->
+    <select id="countByCollegeId" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM college_teacher WHERE college_id = #{collegeId}
+    </select>
+
+</mapper>

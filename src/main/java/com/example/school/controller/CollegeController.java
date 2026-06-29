@@ -7,6 +7,7 @@ import com.example.school.dto.CollegeUpdateRequest;
 import com.example.school.entity.College;
 import com.example.school.service.ICollegeService;
 import com.example.school.vo.CollegeWithClassesVO;
+import com.example.school.vo.CollegeWithDeanVO;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -29,19 +30,19 @@ public class CollegeController {
     // 增：创建学院
     @PostMapping
     public Result<College> createCollege(@Valid @RequestBody CollegeCreateRequest request) {
-        College college = new College();
-        BeanUtils.copyProperties(request, college);
-        College created = collegeService.createCollege(college);
+        College created = collegeService.createCollege(request);
         return Result.success("创建成功", created);
     }
 
-    // 查：分页获取学院列表
+    // 查：多条件分页查询学院（名称模糊、代码模糊，含院长信息）
     @GetMapping
-    public Result<PageResult<College>> getAllColleges(
+    public Result<PageResult<CollegeWithDeanVO>> searchColleges(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String code,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        return Result.success(PageResult.of(collegeService.getAllColleges()));
+        return Result.success(PageResult.of(collegeService.searchColleges(name, code)));
     }
 
     // 查：根据ID获取学院
@@ -50,11 +51,7 @@ public class CollegeController {
         return Result.success(collegeService.getCollegeById(id));
     }
 
-    // 查：按名称模糊搜索学院
-    @GetMapping("/search")
-    public Result<List<College>> getCollegesByName(@RequestParam String name) {
-        return Result.success(collegeService.getCollegesByName(name));
-    }
+    
 
     // 查：按学院代码精确查询
     @GetMapping("/code/{code}")
@@ -65,9 +62,7 @@ public class CollegeController {
     // 改：更新学院
     @PutMapping("/{id}")
     public Result<College> updateCollege(@PathVariable Long id, @Valid @RequestBody CollegeUpdateRequest request) {
-        College collegeDetails = new College();
-        BeanUtils.copyProperties(request, collegeDetails);
-        College updated = collegeService.updateCollege(id, collegeDetails);
+        College updated = collegeService.updateCollege(id, request);
         return Result.success("更新成功", updated);
     }
 

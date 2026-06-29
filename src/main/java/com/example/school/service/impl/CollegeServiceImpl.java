@@ -2,11 +2,18 @@ package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
 import com.example.school.common.ResultCode;
+import com.example.school.dto.CollegeCreateRequest;
+import com.example.school.dto.CollegeTeacherCreateRequest;
+import com.example.school.dto.CollegeUpdateRequest;
 import com.example.school.entity.College;
 import com.example.school.repository.ICollegeRepository;
 import com.example.school.service.ICollegeService;
+import com.example.school.service.ICollegeTeacherService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.CollegeWithClassesVO;
+import com.example.school.vo.CollegeWithDeanVO;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,23 +24,40 @@ public class CollegeServiceImpl implements ICollegeService {
 
     private final ICollegeRepository collegeRepository;
     private final RedisService redisService;
+    private final ICollegeTeacherService collegeTeacherService;
 
     private static final String COLLEGE_KEY_PREFIX = "college:";
     private static final long COLLEGE_CACHE_TTL = 30;
 
-    public CollegeServiceImpl(ICollegeRepository collegeRepository, RedisService redisService) {
+    public CollegeServiceImpl(ICollegeRepository collegeRepository, RedisService redisService,
+                              ICollegeTeacherService collegeTeacherService) {
         this.collegeRepository = collegeRepository;
         this.redisService = redisService;
+        this.collegeTeacherService = collegeTeacherService;
     }
 
     @Override
-    public College createCollege(College college) {
+    public void updateCollegeWithDean(Long collegeId, Long deanId, Integer isDean) {
+        CollegeTeacherCreateRequest ctReq = new CollegeTeacherCreateRequest();
+        ctReq.setCollegeId(collegeId);
+        ctReq.setTeacherId(deanId);
+        ctReq.setIsDean(isDean);
+        collegeTeacherService.createRelation(ctReq);
+    }
+
+    @Override
+    public College createCollege(CollegeCreateRequest collegeCreateRequest) {
         // 检查学院代码是否已存在
-        College existing = collegeRepository.selectCollegeByCode(college.getCode());
+        College existing = collegeRepository.selectCollegeByCode(collegeCreateRequest.getCode());
         if (existing != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "学院代码 [" + college.getCode() + "] 已存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "学院代码 [" + collegeCreateRequest.getCode() + "] 已存在");
         }
+        College college = new College();
+        BeanUtils.copyProperties(collegeCreateRequest, college);
         collegeRepository.insertCollege(college);
+        if (collegeCreateRequest.getDeanId() != null) {
+            updateCollegeWithDean(college.getId(), collegeCreateRequest.getDeanId(), 1);
+        }
         redisService.set(COLLEGE_KEY_PREFIX + college.getId(), college, COLLEGE_CACHE_TTL, TimeUnit.MINUTES);
         return college;
     }
@@ -64,6 +88,11 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
+    public List<CollegeWithDeanVO> searchColleges(String name, String code) {
+        return collegeRepository.searchColleges(name, code);
+    }
+
+    @Override
     public College getCollegeByCode(String code) {
         College college = collegeRepository.selectCollegeByCode(code);
         if (college == null) {
@@ -73,26 +102,29 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
-    public College updateCollege(Long id, College collegeDetails) {
+    public College updateCollege(Long id, CollegeUpdateRequest collegeUpdateRequest) {
         College college = getCollegeById(id);
-        if (collegeDetails.getName() != null) {
-            college.setName(collegeDetails.getName());
+        if (collegeUpdateRequest.getName() != null) {
+            college.setName(collegeUpdateRequest.getName());
         }
-        if (collegeDetails.getCode() != null) {
+        if (collegeUpdateRequest.getCode() != null) {
             // 检查新代码是否与其他学院冲突
-            College existing = collegeRepository.selectCollegeByCode(collegeDetails.getCode());
+            College existing = collegeRepository.selectCollegeByCode(collegeUpdateRequest.getCode());
             if (existing != null && !existing.getId().equals(id)) {
-                throw new BusinessException(ResultCode.BAD_REQUEST, "学院代码 [" + collegeDetails.getCode() + "] 已存在");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "学院代码 [" + collegeUpdateRequest.getCode() + "] 已存在");
             }
-            college.setCode(collegeDetails.getCode());
+            college.setCode(collegeUpdateRequest.getCode());
         }
-        if (collegeDetails.getDescription() != null) {
-            college.setDescription(collegeDetails.getDescription());
+        if (collegeUpdateRequest.getDescription() != null) {
+            college.setDescription(collegeUpdateRequest.getDescription());
         }
-        if (collegeDetails.getPhone() != null) {
-            college.setPhone(collegeDetails.getPhone());
+        if (collegeUpdateRequest.getPhone() != null) {
+            college.setPhone(collegeUpdateRequest.getPhone());
         }
         collegeRepository.updateCollege(college);
+        if (collegeUpdateRequest.getDeanId() != null) {
+            updateCollegeWithDean(id, collegeUpdateRequest.getDeanId(), 1);
+        }
         redisService.set(COLLEGE_KEY_PREFIX + id, college, COLLEGE_CACHE_TTL, TimeUnit.MINUTES);
         return college;
     }

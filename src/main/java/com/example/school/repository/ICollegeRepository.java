@@ -2,6 +2,7 @@ package com.example.school.repository;
 
 import com.example.school.entity.College;
 import com.example.school.vo.CollegeWithClassesVO;
+import com.example.school.vo.CollegeWithDeanVO;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ public interface ICollegeRepository {
     College selectCollegeById(Long id);
 
     List<College> selectCollegesByName(String name);
+
+    List<CollegeWithDeanVO> searchColleges(String name, String code);
 
     College selectCollegeByCode(String code);
 

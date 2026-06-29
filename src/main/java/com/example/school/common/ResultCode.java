@@ -31,7 +31,10 @@ public enum ResultCode {
     TEACHER_NOT_FOUND(7001, "教师不存在"),
 
     // 业务错误 - 学院
-    COLLEGE_NOT_FOUND(8001, "学院不存在");
+    COLLEGE_NOT_FOUND(8001, "学院不存在"),
+
+    // 业务错误 - 学院教师关系
+    COLLEGE_TEACHER_NOT_FOUND(9001, "学院教师关系不存在");
 
     private final int code;
     private final String message;

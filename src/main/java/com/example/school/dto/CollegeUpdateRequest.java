@@ -16,6 +16,8 @@ public class CollegeUpdateRequest {
     @Size(max = 200, message = "学院简介不能超过200个字符")
     private String description;
 
+    private Long deanId;
+
     @Size(max = 20, message = "联系电话不能超过20个字符")
     private String phone;
 }

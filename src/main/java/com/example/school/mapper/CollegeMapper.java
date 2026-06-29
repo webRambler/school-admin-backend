@@ -2,7 +2,9 @@ package com.example.school.mapper;
 
 import com.example.school.entity.College;
 import com.example.school.vo.CollegeWithClassesVO;
+import com.example.school.vo.CollegeWithDeanVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,6 +22,9 @@ public interface CollegeMapper {
 
     // 根据名称模糊查询学院
     List<College> selectCollegesByName(String name);
+
+    // 多条件查询学院（名称模糊、代码模糊，含院长信息）
+    List<CollegeWithDeanVO> searchColleges(@Param("name") String name, @Param("code") String code);
 
     // 根据学院代码查询学院
     College selectCollegeByCode(String code);
