@@ -8,12 +8,11 @@ import com.example.school.entity.Score;
 import com.example.school.service.IScoreService;
 import com.example.school.vo.ScoreDetailVO;
 import com.example.school.vo.ScoreRankVO;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/scores")
@@ -41,7 +40,7 @@ public class ScoreController {
     public Result<PageResult<Score>> getAllScores(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(scoreService.getAllScores()));
     }
 
@@ -51,16 +50,24 @@ public class ScoreController {
         return Result.success(scoreService.getScoreById(id));
     }
 
-    // 查：按学生ID查询成绩
+    // 查：按学生ID查询成绩（分页）
     @GetMapping("/student/{studentId}")
-    public Result<List<Score>> getScoresByStudentId(@PathVariable Long studentId) {
-        return Result.success(scoreService.getScoresByStudentId(studentId));
+    public Result<PageResult<Score>> getScoresByStudentId(
+            @PathVariable Long studentId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoresByStudentId(studentId)));
     }
 
-    // 查：按课程ID查询成绩
+    // 查：按课程ID查询成绩（分页）
     @GetMapping("/course/{courseId}")
-    public Result<List<Score>> getScoresByCourseId(@PathVariable Long courseId) {
-        return Result.success(scoreService.getScoresByCourseId(courseId));
+    public Result<PageResult<Score>> getScoresByCourseId(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoresByCourseId(courseId)));
     }
 
     // 查：按学生和课程查询成绩
@@ -69,16 +76,23 @@ public class ScoreController {
         return Result.success(scoreService.getScoreByStudentAndCourse(studentId, courseId));
     }
 
-    // 查：按考试类型查询成绩
+    // 查：按考试类型查询成绩（分页）
     @GetMapping("/exam-type/{examType}")
-    public Result<List<Score>> getScoresByExamType(@PathVariable String examType) {
-        return Result.success(scoreService.getScoresByExamType(examType));
+    public Result<PageResult<Score>> getScoresByExamType(
+            @PathVariable String examType,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoresByExamType(examType)));
     }
 
-    // 查：查询不及格成绩
+    // 查：查询不及格成绩（分页）
     @GetMapping("/failed")
-    public Result<List<Score>> getFailedScores() {
-        return Result.success(scoreService.getFailedScores());
+    public Result<PageResult<Score>> getFailedScores(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getFailedScores()));
     }
 
     // 改：更新成绩
@@ -105,16 +119,24 @@ public class ScoreController {
         return Result.success(scoreService.getScoreDetail(id));
     }
 
-    // 查：按学生ID查询成绩详情列表
+    // 查：按学生ID查询成绩详情列表（分页）
     @GetMapping("/student/{studentId}/detail")
-    public Result<List<ScoreDetailVO>> getScoreDetailsByStudentId(@PathVariable Long studentId) {
-        return Result.success(scoreService.getScoreDetailsByStudentId(studentId));
+    public Result<PageResult<ScoreDetailVO>> getScoreDetailsByStudentId(
+            @PathVariable Long studentId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoreDetailsByStudentId(studentId)));
     }
 
-    // 查：按课程ID查询成绩详情列表
+    // 查：按课程ID查询成绩详情列表（分页）
     @GetMapping("/course/{courseId}/detail")
-    public Result<List<ScoreDetailVO>> getScoreDetailsByCourseId(@PathVariable Long courseId) {
-        return Result.success(scoreService.getScoreDetailsByCourseId(courseId));
+    public Result<PageResult<ScoreDetailVO>> getScoreDetailsByCourseId(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoreDetailsByCourseId(courseId)));
     }
 
     // 查：分页获取所有成绩详情
@@ -122,34 +144,48 @@ public class ScoreController {
     public Result<PageResult<ScoreDetailVO>> getAllScoreDetails(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(scoreService.getAllScoreDetails()));
     }
 
-    // 查：查询不及格成绩详情（含学生和课程信息）
+    // 查：查询不及格成绩详情（含学生和课程信息，分页）
     @GetMapping("/failed/detail")
-    public Result<List<ScoreDetailVO>> getFailedScoreDetails() {
-        return Result.success(scoreService.getFailedScoreDetails());
+    public Result<PageResult<ScoreDetailVO>> getFailedScoreDetails(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getFailedScoreDetails()));
     }
 
-    // 查：按考试类型查询成绩详情
+    // 查：按考试类型查询成绩详情（分页）
     @GetMapping("/exam-type/{examType}/detail")
-    public Result<List<ScoreDetailVO>> getScoreDetailsByExamType(@PathVariable String examType) {
-        return Result.success(scoreService.getScoreDetailsByExamType(examType));
+    public Result<PageResult<ScoreDetailVO>> getScoreDetailsByExamType(
+            @PathVariable String examType,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoreDetailsByExamType(examType)));
     }
 
     // ========== 成绩排名 ==========
 
-    // 查：课程成绩排名
+    // 查：课程成绩排名（分页）
     @GetMapping("/ranking/course/{courseId}")
-    public Result<List<ScoreRankVO>> getScoreRankingByCourseId(@PathVariable Long courseId) {
-        return Result.success(scoreService.getScoreRankingByCourseId(courseId));
+    public Result<PageResult<ScoreRankVO>> getScoreRankingByCourseId(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoreRankingByCourseId(courseId)));
     }
 
-    // 查：班级课程成绩排名
+    // 查：班级课程成绩排名（分页）
     @GetMapping("/ranking/class/{classId}/course/{courseId}")
-    public Result<List<ScoreRankVO>> getScoreRankingByClassAndCourse(
-            @PathVariable Long classId, @PathVariable Long courseId) {
-        return Result.success(scoreService.getScoreRankingByClassAndCourse(classId, courseId));
+    public Result<PageResult<ScoreRankVO>> getScoreRankingByClassAndCourse(
+            @PathVariable Long classId, @PathVariable Long courseId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(scoreService.getScoreRankingByClassAndCourse(classId, courseId)));
     }
 }

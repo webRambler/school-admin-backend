@@ -16,6 +16,8 @@ public interface ICollegeService {
 
     College getCollegeById(Long id);
 
+    CollegeWithDeanVO getCollegeDetailById(Long id);
+
     List<College> getCollegesByName(String name);
 
     List<CollegeWithDeanVO> searchColleges(String name, String code);

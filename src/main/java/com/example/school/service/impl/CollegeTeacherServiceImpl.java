@@ -10,6 +10,7 @@ import com.example.school.repository.ITeacherRepository;
 import com.example.school.service.ICollegeTeacherService;
 import com.example.school.vo.CollegeTeacherVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class CollegeTeacherServiceImpl implements ICollegeTeacherService {
     }
 
     @Override
+    @Transactional
     public CollegeTeacher createRelation(CollegeTeacherCreateRequest request) {
         // 校验学院是否存在
         if (collegeRepository.selectCollegeById(request.getCollegeId()) == null) {
@@ -86,6 +88,7 @@ public class CollegeTeacherServiceImpl implements ICollegeTeacherService {
     }
 
     @Override
+    @Transactional
     public void setIsDean(Long id, Integer isDean) {
         CollegeTeacher ct = getById(id);
         // 若设置为院长，检查该学院是否已有其他院长
@@ -100,6 +103,7 @@ public class CollegeTeacherServiceImpl implements ICollegeTeacherService {
     }
 
     @Override
+    @Transactional
     public void deleteRelation(Long id) {
         getById(id); // 确保存在
         collegeTeacherRepository.deleteById(id);

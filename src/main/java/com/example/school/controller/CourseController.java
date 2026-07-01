@@ -8,13 +8,12 @@ import com.example.school.entity.Course;
 import com.example.school.service.ICourseService;
 import com.example.school.vo.CourseStatisticsVO;
 import com.example.school.vo.CourseWithTeacherVO;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
@@ -42,7 +41,7 @@ public class CourseController {
     public Result<PageResult<Course>> getAllCourses(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(courseService.getAllCourses()));
     }
 
@@ -60,7 +59,7 @@ public class CourseController {
             @RequestParam(required = false) BigDecimal credit,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(courseService.searchCourses(name, teacherName, credit)));
     }
 

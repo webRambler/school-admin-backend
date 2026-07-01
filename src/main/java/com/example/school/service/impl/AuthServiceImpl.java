@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.User;
 import com.example.school.repository.IUserRepository;
@@ -9,6 +10,7 @@ import com.example.school.service.RedisService;
 import com.example.school.vo.LoginVO;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,11 +20,11 @@ import java.util.concurrent.TimeUnit;
 public class AuthServiceImpl implements IAuthService {
 
     /** Redis key 前缀：access token */
-    public static final String ACCESS_TOKEN_PREFIX = "auth:access:";
+    public static final String ACCESS_TOKEN_PREFIX = CacheConstants.AUTH_ACCESS_PREFIX;
     /** Redis key 前缀：refresh token（存储用户名） */
-    public static final String REFRESH_TOKEN_PREFIX = "auth:refresh:";
+    public static final String REFRESH_TOKEN_PREFIX = CacheConstants.AUTH_REFRESH_PREFIX;
     /** Redis key 前缀：用户名 → refresh token 反查（登出时删除 refresh key 用） */
-    private static final String USER_REFRESH_PREFIX = "auth:user:refresh:";
+    private static final String USER_REFRESH_PREFIX = CacheConstants.AUTH_USER_REFRESH_PREFIX;
 
     /** accessToken 有效期：4 小时 */
     private static final long ACCESS_TTL_HOURS = 4;
@@ -53,6 +55,7 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional
     public LoginVO register(String username, String password, String nickname) {
         // 1. 校验用户名是否已存在
         User existUser = userRepository.selectByUsername(username);

@@ -6,7 +6,7 @@ import com.example.school.dto.TeacherCreateRequest;
 import com.example.school.dto.TeacherUpdateRequest;
 import com.example.school.entity.Teacher;
 import com.example.school.service.ITeacherService;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +39,7 @@ public class TeacherController {
     public Result<PageResult<Teacher>> getAllTeachers(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(teacherService.getAllTeachers()));
     }
 
@@ -49,12 +49,15 @@ public class TeacherController {
         return Result.success(teacherService.getTeacherById(id));
     }
 
-    // 查：多条件查询教师（姓名模糊 + 学院ID可选）
+    // 查：多条件分页查询教师（姓名模糊 + 学院ID可选）
     @GetMapping("/search")
-    public Result<List<Teacher>> searchTeachers(
+    public Result<PageResult<Teacher>> searchTeachers(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Long collegeId) {
-        return Result.success(teacherService.searchTeachers(name, collegeId));
+            @RequestParam(required = false) Long collegeId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(teacherService.searchTeachers(name, collegeId)));
     }
 
     // 查：按职称查询教师

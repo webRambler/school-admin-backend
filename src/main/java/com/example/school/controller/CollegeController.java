@@ -8,12 +8,11 @@ import com.example.school.entity.College;
 import com.example.school.service.ICollegeService;
 import com.example.school.vo.CollegeWithClassesVO;
 import com.example.school.vo.CollegeWithDeanVO;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/colleges")
@@ -41,14 +40,14 @@ public class CollegeController {
             @RequestParam(required = false) String code,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(collegeService.searchColleges(name, code)));
     }
 
-    // 查：根据ID获取学院
+    // 查：根据ID获取学院（含院长信息）
     @GetMapping("/{id}")
-    public Result<College> getCollegeById(@PathVariable Long id) {
-        return Result.success(collegeService.getCollegeById(id));
+    public Result<CollegeWithDeanVO> getCollegeById(@PathVariable Long id) {
+        return Result.success(collegeService.getCollegeDetailById(id));
     }
 
     

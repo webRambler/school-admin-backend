@@ -34,6 +34,11 @@ public class CollegeRepositoryImpl implements ICollegeRepository {
     }
 
     @Override
+    public CollegeWithDeanVO selectCollegeDetailById(Long id) {
+        return collegeMapper.selectCollegeDetailById(id);
+    }
+
+    @Override
     public List<College> selectCollegesByName(String name) {
         return collegeMapper.selectCollegesByName(name);
     }

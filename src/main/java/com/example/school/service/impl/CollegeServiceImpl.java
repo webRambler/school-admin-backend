@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.dto.CollegeCreateRequest;
 import com.example.school.dto.CollegeTeacherCreateRequest;
@@ -15,6 +16,7 @@ import com.example.school.vo.CollegeWithDeanVO;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -26,8 +28,8 @@ public class CollegeServiceImpl implements ICollegeService {
     private final RedisService redisService;
     private final ICollegeTeacherService collegeTeacherService;
 
-    private static final String COLLEGE_KEY_PREFIX = "college:";
-    private static final long COLLEGE_CACHE_TTL = 30;
+    private static final String COLLEGE_KEY_PREFIX = CacheConstants.COLLEGE_PREFIX;
+    private static final long COLLEGE_CACHE_TTL = CacheConstants.ENTITY_TTL_MINUTES;
 
     public CollegeServiceImpl(ICollegeRepository collegeRepository, RedisService redisService,
                               ICollegeTeacherService collegeTeacherService) {
@@ -46,6 +48,7 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
+    @Transactional
     public College createCollege(CollegeCreateRequest collegeCreateRequest) {
         // 检查学院代码是否已存在
         College existing = collegeRepository.selectCollegeByCode(collegeCreateRequest.getCode());
@@ -83,6 +86,15 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
+    public CollegeWithDeanVO getCollegeDetailById(Long id) {
+        CollegeWithDeanVO vo = collegeRepository.selectCollegeDetailById(id);
+        if (vo == null) {
+            throw new BusinessException(ResultCode.COLLEGE_NOT_FOUND);
+        }
+        return vo;
+    }
+
+    @Override
     public List<College> getCollegesByName(String name) {
         return collegeRepository.selectCollegesByName(name);
     }
@@ -102,6 +114,7 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
+    @Transactional
     public College updateCollege(Long id, CollegeUpdateRequest collegeUpdateRequest) {
         College college = getCollegeById(id);
         if (collegeUpdateRequest.getName() != null) {
@@ -130,6 +143,7 @@ public class CollegeServiceImpl implements ICollegeService {
     }
 
     @Override
+    @Transactional
     public void deleteCollege(Long id) {
         getCollegeById(id);
         // 检查学院下是否还有班级

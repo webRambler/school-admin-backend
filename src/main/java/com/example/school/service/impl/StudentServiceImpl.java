@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Student;
 import com.example.school.repository.IScoreRepository;
@@ -10,6 +11,7 @@ import com.example.school.service.RedisService;
 import com.example.school.vo.StudentCourseScoreVO;
 import com.example.school.vo.StudentWithClassVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +23,8 @@ public class StudentServiceImpl implements IStudentService {
     private final IScoreRepository scoreRepository;
     private final RedisService redisService;
 
-    private static final String STUDENT_KEY_PREFIX = "student:";
-    private static final long STUDENT_CACHE_TTL = 30;
+    private static final String STUDENT_KEY_PREFIX = CacheConstants.STUDENT_PREFIX;
+    private static final long STUDENT_CACHE_TTL = CacheConstants.ENTITY_TTL_MINUTES;
 
     public StudentServiceImpl(IStudentRepository studentRepository, IScoreRepository scoreRepository, RedisService redisService) {
         this.studentRepository = studentRepository;
@@ -31,6 +33,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
+    @Transactional
     public Student createStudent(Student student) {
         studentRepository.insertStudent(student);
         redisService.set(STUDENT_KEY_PREFIX + student.getId(), student, STUDENT_CACHE_TTL, TimeUnit.MINUTES);
@@ -73,6 +76,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
+    @Transactional
     public Student updateStudent(Long id, Student studentDetails) {
         Student student = getStudentById(id);
         if (studentDetails.getName() != null) {
@@ -99,6 +103,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
+    @Transactional
     public void deleteStudent(Long id) {
         getStudentById(id);
         // 删除学生时，同时删除其所有成绩

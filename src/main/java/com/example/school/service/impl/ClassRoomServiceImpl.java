@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.ClassRoom;
 import com.example.school.repository.IClassRoomRepository;
@@ -8,6 +9,7 @@ import com.example.school.service.IClassRoomService;
 import com.example.school.service.RedisService;
 import com.example.school.vo.ClassRoomStatisticsVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,8 +20,8 @@ public class ClassRoomServiceImpl implements IClassRoomService {
     private final IClassRoomRepository classRoomRepository;
     private final RedisService redisService;
 
-    private static final String CLASSROOM_KEY_PREFIX = "classroom:";
-    private static final long CLASSROOM_CACHE_TTL = 30;
+    private static final String CLASSROOM_KEY_PREFIX = CacheConstants.CLASSROOM_PREFIX;
+    private static final long CLASSROOM_CACHE_TTL = CacheConstants.ENTITY_TTL_MINUTES;
 
     public ClassRoomServiceImpl(IClassRoomRepository classRoomRepository, RedisService redisService) {
         this.classRoomRepository = classRoomRepository;
@@ -27,6 +29,7 @@ public class ClassRoomServiceImpl implements IClassRoomService {
     }
 
     @Override
+    @Transactional
     public ClassRoom createClassRoom(ClassRoom classRoom) {
         classRoomRepository.insertClassRoom(classRoom);
         redisService.set(CLASSROOM_KEY_PREFIX + classRoom.getId(), classRoom, CLASSROOM_CACHE_TTL, TimeUnit.MINUTES);
@@ -71,6 +74,7 @@ public class ClassRoomServiceImpl implements IClassRoomService {
     }
 
     @Override
+    @Transactional
     public ClassRoom updateClassRoom(Long id, ClassRoom classRoomDetails) {
         ClassRoom classRoom = getClassRoomById(id);
         if (classRoomDetails.getCollegeId() != null) {
@@ -94,6 +98,7 @@ public class ClassRoomServiceImpl implements IClassRoomService {
     }
 
     @Override
+    @Transactional
     public void deleteClassRoom(Long id) {
         getClassRoomById(id);
         // 检查班级下是否还有学生

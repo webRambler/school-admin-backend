@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Course;
 import com.example.school.repository.ICourseRepository;
@@ -9,6 +10,7 @@ import com.example.school.service.RedisService;
 import com.example.school.vo.CourseStatisticsVO;
 import com.example.school.vo.CourseWithTeacherVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,8 +22,8 @@ public class CourseServiceImpl implements ICourseService {
     private final ICourseRepository courseRepository;
     private final RedisService redisService;
 
-    private static final String COURSE_KEY_PREFIX = "course:";
-    private static final long COURSE_CACHE_TTL = 30;
+    private static final String COURSE_KEY_PREFIX = CacheConstants.COURSE_PREFIX;
+    private static final long COURSE_CACHE_TTL = CacheConstants.ENTITY_TTL_MINUTES;
 
     public CourseServiceImpl(ICourseRepository courseRepository, RedisService redisService) {
         this.courseRepository = courseRepository;
@@ -29,6 +31,7 @@ public class CourseServiceImpl implements ICourseService {
     }
 
     @Override
+    @Transactional
     public Course createCourse(Course course) {
         courseRepository.insertCourse(course);
         redisService.set(COURSE_KEY_PREFIX + course.getId(), course, COURSE_CACHE_TTL, TimeUnit.MINUTES);
@@ -76,6 +79,7 @@ public class CourseServiceImpl implements ICourseService {
     }
 
     @Override
+    @Transactional
     public Course updateCourse(Long id, Course courseDetails) {
         Course course = getCourseById(id);
         if (courseDetails.getTeacherId() != null) {
@@ -99,6 +103,7 @@ public class CourseServiceImpl implements ICourseService {
     }
 
     @Override
+    @Transactional
     public void deleteCourse(Long id) {
         getCourseById(id);
         courseRepository.deleteCourse(id);

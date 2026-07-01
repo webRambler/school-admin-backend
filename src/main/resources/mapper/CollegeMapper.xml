@@ -13,9 +13,22 @@
         SELECT id, name, code, description, phone, create_time, update_time FROM college
     </select>
 
-    <!-- 根据ID查询学院 -->
+    <!-- 根据ID查询学院（内部使用，返回 College 实体） -->
     <select id="selectCollegeById" resultType="College">
-        SELECT id, name, code, description, phone, create_time, update_time FROM college WHERE id = #{id}
+        SELECT id, name, code, description, phone, create_time, update_time
+        FROM college WHERE id = #{id}
+    </select>
+
+    <!-- 根据ID查询学院详情（含院长信息，返回 CollegeWithDeanVO） -->
+    <select id="selectCollegeDetailById" resultType="CollegeWithDeanVO">
+        SELECT
+            c.id, c.name, c.code, c.description, c.phone,
+            c.create_time, c.update_time,
+            t.id AS deanId, t.name AS deanName, t.phone AS deanPhone, t.title AS deanTitle
+        FROM college c
+        LEFT JOIN college_teacher ct ON c.id = ct.college_id AND ct.is_dean = 1
+        LEFT JOIN teacher t ON ct.teacher_id = t.id
+        WHERE c.id = #{id}
     </select>
 
     <!-- 根据名称模糊查询学院 -->
@@ -29,7 +42,7 @@
         SELECT
             c.id, c.name, c.code, c.description, c.phone,
             c.create_time, c.update_time,
-            t.id AS deanId, t.name AS deanName, t.phone AS deanPhone
+            t.id AS deanId, t.name AS deanName, t.phone AS deanPhone, t.title AS deanTitle
         FROM college c
         LEFT JOIN college_teacher ct ON c.id = ct.college_id AND ct.is_dean = 1
         LEFT JOIN teacher t ON ct.teacher_id = t.id

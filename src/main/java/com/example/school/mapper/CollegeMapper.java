@@ -17,8 +17,11 @@ public interface CollegeMapper {
     // 查询所有学院
     List<College> selectAllColleges();
 
-    // 根据ID查询学院
+    // 根据ID查询学院（内部使用，返回 College 实体）
     College selectCollegeById(Long id);
+
+    // 根据ID查询学院详情（含院长信息）
+    CollegeWithDeanVO selectCollegeDetailById(Long id);
 
     // 根据名称模糊查询学院
     List<College> selectCollegesByName(String name);

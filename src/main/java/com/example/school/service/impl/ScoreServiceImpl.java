@@ -1,6 +1,7 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Score;
 import com.example.school.repository.IScoreRepository;
@@ -9,6 +10,7 @@ import com.example.school.service.RedisService;
 import com.example.school.vo.ScoreDetailVO;
 import com.example.school.vo.ScoreRankVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +21,8 @@ public class ScoreServiceImpl implements IScoreService {
     private final IScoreRepository scoreRepository;
     private final RedisService redisService;
 
-    private static final String SCORE_KEY_PREFIX = "score:";
-    private static final long SCORE_CACHE_TTL = 15;
+    private static final String SCORE_KEY_PREFIX = CacheConstants.SCORE_PREFIX;
+    private static final long SCORE_CACHE_TTL = CacheConstants.SCORE_TTL_MINUTES;
 
     public ScoreServiceImpl(IScoreRepository scoreRepository, RedisService redisService) {
         this.scoreRepository = scoreRepository;
@@ -28,6 +30,7 @@ public class ScoreServiceImpl implements IScoreService {
     }
 
     @Override
+    @Transactional
     public Score createScore(Score score) {
         // 检查同一学生同一课程同一考试类型是否已有成绩
         Score existing = scoreRepository.selectScoreByStudentCourseAndExamType(
@@ -90,6 +93,7 @@ public class ScoreServiceImpl implements IScoreService {
     }
 
     @Override
+    @Transactional
     public Score updateScore(Long id, Score scoreDetails) {
         Score score = getScoreById(id);
         if (scoreDetails.getScore() != null) {
@@ -104,6 +108,7 @@ public class ScoreServiceImpl implements IScoreService {
     }
 
     @Override
+    @Transactional
     public void deleteScore(Long id) {
         getScoreById(id);
         scoreRepository.deleteScore(id);

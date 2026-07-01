@@ -22,4 +22,5 @@ public class CollegeWithDeanVO {
     private Long deanId;
     private String deanName;
     private String deanPhone;
+    private String deanTitle;
 }

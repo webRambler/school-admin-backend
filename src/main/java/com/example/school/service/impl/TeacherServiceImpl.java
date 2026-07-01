@@ -1,12 +1,14 @@
 package com.example.school.service.impl;
 
 import com.example.school.common.BusinessException;
+import com.example.school.common.CacheConstants;
 import com.example.school.common.ResultCode;
 import com.example.school.entity.Teacher;
 import com.example.school.repository.ITeacherRepository;
 import com.example.school.service.ITeacherService;
 import com.example.school.service.RedisService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +19,8 @@ public class TeacherServiceImpl implements ITeacherService {
     private final ITeacherRepository teacherRepository;
     private final RedisService redisService;
 
-    private static final String TEACHER_KEY_PREFIX = "teacher:";
-    private static final long TEACHER_CACHE_TTL = 30;
+    private static final String TEACHER_KEY_PREFIX = CacheConstants.TEACHER_PREFIX;
+    private static final long TEACHER_CACHE_TTL = CacheConstants.ENTITY_TTL_MINUTES;
 
     public TeacherServiceImpl(ITeacherRepository teacherRepository, RedisService redisService) {
         this.teacherRepository = teacherRepository;
@@ -26,6 +28,7 @@ public class TeacherServiceImpl implements ITeacherService {
     }
 
     @Override
+    @Transactional
     public Teacher createTeacher(Teacher teacher) {
         teacherRepository.insertTeacher(teacher);
         redisService.set(TEACHER_KEY_PREFIX + teacher.getId(), teacher, TEACHER_CACHE_TTL, TimeUnit.MINUTES);
@@ -68,6 +71,7 @@ public class TeacherServiceImpl implements ITeacherService {
     }
 
     @Override
+    @Transactional
     public Teacher updateTeacher(Long id, Teacher teacherDetails) {
         Teacher teacher = getTeacherById(id);
         if (teacherDetails.getName() != null) {
@@ -94,6 +98,7 @@ public class TeacherServiceImpl implements ITeacherService {
     }
 
     @Override
+    @Transactional
     public void deleteTeacher(Long id) {
         getTeacherById(id);
         teacherRepository.deleteTeacher(id);

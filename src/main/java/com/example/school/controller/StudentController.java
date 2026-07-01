@@ -8,12 +8,11 @@ import com.example.school.entity.Student;
 import com.example.school.service.IStudentService;
 import com.example.school.vo.StudentCourseScoreVO;
 import com.example.school.vo.StudentWithClassVO;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
@@ -41,7 +40,7 @@ public class StudentController {
     public Result<PageResult<Student>> getAllStudents(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(studentService.getAllStudents()));
     }
 
@@ -51,22 +50,34 @@ public class StudentController {
         return Result.success(studentService.getStudentById(id));
     }
 
-    // 查：按姓名模糊搜索学生
+    // 查：按姓名模糊搜索学生（分页）
     @GetMapping("/search")
-    public Result<List<Student>> getStudentsByName(@RequestParam String name) {
-        return Result.success(studentService.getStudentsByName(name));
+    public Result<PageResult<Student>> getStudentsByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.getStudentsByName(name)));
     }
 
-    // 查：按班级ID查询学生
+    // 查：按班级ID查询学生（分页）
     @GetMapping("/class/{classId}")
-    public Result<List<Student>> getStudentsByClassId(@PathVariable Long classId) {
-        return Result.success(studentService.getStudentsByClassId(classId));
+    public Result<PageResult<Student>> getStudentsByClassId(
+            @PathVariable Long classId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.getStudentsByClassId(classId)));
     }
 
-    // 查：按性别查询学生
+    // 查：按性别查询学生（分页）
     @GetMapping("/gender/{gender}")
-    public Result<List<Student>> getStudentsByGender(@PathVariable String gender) {
-        return Result.success(studentService.getStudentsByGender(gender));
+    public Result<PageResult<Student>> getStudentsByGender(
+            @PathVariable String gender,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.getStudentsByGender(gender)));
     }
 
     // 改：更新学生
@@ -93,10 +104,14 @@ public class StudentController {
         return Result.success(studentService.getStudentWithClass(id));
     }
 
-    // 查：获取班级下所有学生及其班级信息
+    // 查：获取班级下所有学生及其班级信息（分页）
     @GetMapping("/class/{classId}/with-class")
-    public Result<List<StudentWithClassVO>> getStudentsWithClassByClassId(@PathVariable Long classId) {
-        return Result.success(studentService.getStudentsWithClassByClassId(classId));
+    public Result<PageResult<StudentWithClassVO>> getStudentsWithClassByClassId(
+            @PathVariable Long classId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.getStudentsWithClassByClassId(classId)));
     }
 
     // 查：分页获取所有学生及其班级信息
@@ -104,14 +119,18 @@ public class StudentController {
     public Result<PageResult<StudentWithClassVO>> getAllStudentsWithClass(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(studentService.getAllStudentsWithClass()));
     }
 
-    // 查：获取学生的所有课程和成绩（三表连接：student + score + course）
+    // 查：获取学生的所有课程和成绩（三表连接：student + score + course，分页）
     @GetMapping("/{id}/courses-scores")
-    public Result<List<StudentCourseScoreVO>> getStudentCourseScores(@PathVariable Long id) {
-        return Result.success(studentService.getStudentCourseScores(id));
+    public Result<PageResult<StudentCourseScoreVO>> getStudentCourseScores(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(studentService.getStudentCourseScores(id)));
     }
 
     // 查：统计学生选修课程数量
@@ -130,7 +149,7 @@ public class StudentController {
             @RequestParam(required = false) Integer age,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(studentService.searchStudentsWithClass(gender, className, name, major, age)));
     }
 }

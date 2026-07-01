@@ -1,14 +1,15 @@
 package com.example.school.controller;
 
+import com.example.school.common.PageResult;
 import com.example.school.common.Result;
 import com.example.school.dto.CollegeTeacherCreateRequest;
 import com.example.school.entity.CollegeTeacher;
 import com.example.school.service.ICollegeTeacherService;
 import com.example.school.vo.CollegeTeacherVO;
+import com.example.school.utils.PageUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/college-teachers")
@@ -51,16 +52,24 @@ public class CollegeTeacherController {
 
     // ========== 关联查询 ==========
 
-    // 查：查询某学院下所有教师（含是否院长）
+    // 查：查询某学院下所有教师（含是否院长，分页）
     @GetMapping("/college/{collegeId}")
-    public Result<List<CollegeTeacherVO>> getTeachersByCollege(@PathVariable Long collegeId) {
-        return Result.success(collegeTeacherService.getTeachersByCollege(collegeId));
+    public Result<PageResult<CollegeTeacherVO>> getTeachersByCollege(
+            @PathVariable Long collegeId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(collegeTeacherService.getTeachersByCollege(collegeId)));
     }
 
-    // 查：查询某教师关联的所有学院
+    // 查：查询某教师关联的所有学院（分页）
     @GetMapping("/teacher/{teacherId}")
-    public Result<List<CollegeTeacherVO>> getCollegesByTeacher(@PathVariable Long teacherId) {
-        return Result.success(collegeTeacherService.getCollegesByTeacher(teacherId));
+    public Result<PageResult<CollegeTeacherVO>> getCollegesByTeacher(
+            @PathVariable Long teacherId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(collegeTeacherService.getCollegesByTeacher(teacherId)));
     }
 
     // 查：统计学院下关联的教师数量

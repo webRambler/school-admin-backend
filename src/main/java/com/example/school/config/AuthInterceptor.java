@@ -1,7 +1,10 @@
 package com.example.school.config;
 
+import com.example.school.common.Result;
+import com.example.school.common.ResultCode;
 import com.example.school.service.impl.AuthServiceImpl;
 import com.example.school.service.RedisService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,9 +25,11 @@ import java.io.PrintWriter;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final RedisService redisService;
+    private final ObjectMapper objectMapper;
 
-    public AuthInterceptor(RedisService redisService) {
+    public AuthInterceptor(RedisService redisService, ObjectMapper objectMapper) {
         this.redisService = redisService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -48,8 +53,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         // accessToken 无效或不存在，返回 401
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
+        Result<Void> result = Result.error(ResultCode.UNAUTHORIZED, "accessToken 已过期，请使用 refreshToken 刷新");
         try (PrintWriter writer = response.getWriter()) {
-            writer.write("{\"code\":401,\"message\":\"accessToken 已过期，请使用 refreshToken 刷新\",\"data\":null}");
+            writer.write(objectMapper.writeValueAsString(result));
         }
         return false;
     }

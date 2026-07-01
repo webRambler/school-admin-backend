@@ -7,12 +7,11 @@ import com.example.school.dto.ClassRoomUpdateRequest;
 import com.example.school.entity.ClassRoom;
 import com.example.school.service.IClassRoomService;
 import com.example.school.vo.ClassRoomStatisticsVO;
-import com.github.pagehelper.PageHelper;
+import com.example.school.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/classrooms")
@@ -40,7 +39,7 @@ public class ClassRoomController {
     public Result<PageResult<ClassRoom>> getAllClassRooms(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageUtils.startPage(pageNum, pageSize);
         return Result.success(PageResult.of(classRoomService.getAllClassRooms()));
     }
 
@@ -50,22 +49,34 @@ public class ClassRoomController {
         return Result.success(classRoomService.getClassRoomById(id));
     }
 
-    // 查：按名称模糊搜索班级
+    // 查：按名称模糊搜索班级（分页）
     @GetMapping("/search")
-    public Result<List<ClassRoom>> getClassRoomsByName(@RequestParam String name) {
-        return Result.success(classRoomService.getClassRoomsByName(name));
+    public Result<PageResult<ClassRoom>> getClassRoomsByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(classRoomService.getClassRoomsByName(name)));
     }
 
-    // 查：按年级查询班级
+    // 查：按年级查询班级（分页）
     @GetMapping("/grade/{grade}")
-    public Result<List<ClassRoom>> getClassRoomsByGrade(@PathVariable String grade) {
-        return Result.success(classRoomService.getClassRoomsByGrade(grade));
+    public Result<PageResult<ClassRoom>> getClassRoomsByGrade(
+            @PathVariable String grade,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(classRoomService.getClassRoomsByGrade(grade)));
     }
 
-    // 查：按专业查询班级
+    // 查：按专业查询班级（分页）
     @GetMapping("/major/{major}")
-    public Result<List<ClassRoom>> getClassRoomsByMajor(@PathVariable String major) {
-        return Result.success(classRoomService.getClassRoomsByMajor(major));
+    public Result<PageResult<ClassRoom>> getClassRoomsByMajor(
+            @PathVariable String major,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageUtils.startPage(pageNum, pageSize);
+        return Result.success(PageResult.of(classRoomService.getClassRoomsByMajor(major)));
     }
 
     // 改：更新班级

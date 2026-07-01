@@ -3,7 +3,9 @@ package com.example.school.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -64,6 +66,29 @@ public class GlobalExceptionHandler {
     public Result<Void> handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
         String message = "缺少必填参数: " + e.getParameterName();
         log.warn("缺少请求参数: {}", e.getParameterName());
+        return Result.error(ResultCode.BAD_REQUEST, message);
+    }
+
+    /**
+     * 路径参数 / 请求参数类型不匹配（如期望 Long 但传入字符串）
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Result<Void> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        String requiredTypeName = e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "未知";
+        String message = "参数类型错误: " + e.getName() + " 需要 " + requiredTypeName;
+        log.warn("参数类型不匹配: {}", message);
+        return Result.error(ResultCode.BAD_REQUEST, message);
+    }
+
+    /**
+     * @ModelAttribute 表单绑定校验失败
+     */
+    @ExceptionHandler(BindException.class)
+    public Result<Void> handleBindException(BindException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+        log.warn("表单参数绑定失败: {}", message);
         return Result.error(ResultCode.BAD_REQUEST, message);
     }
 

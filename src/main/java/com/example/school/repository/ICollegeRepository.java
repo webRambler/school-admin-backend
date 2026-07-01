@@ -14,6 +14,8 @@ public interface ICollegeRepository {
 
     College selectCollegeById(Long id);
 
+    CollegeWithDeanVO selectCollegeDetailById(Long id);
+
     List<College> selectCollegesByName(String name);
 
     List<CollegeWithDeanVO> searchColleges(String name, String code);
